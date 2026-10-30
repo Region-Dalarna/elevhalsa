@@ -220,7 +220,12 @@ elevhalsa_rita_detalj <- function(df_kort, konsuppdelat) {
   g <- ggplot2::ggplot(d, ggplot2::aes(x = .data$aldersgrupp, y = .data$andel, fill = .data$svar)) +
     ggiraph::geom_col_interactive(
       ggplot2::aes(tooltip = .data$tooltip, data_id = .data$data_id),
-      position = "stack", width = 0.6
+      # reverse = TRUE så att svarsalternativen staplas underifrån och upp
+      # i samma ordning som de listas uppifrån och ner i teckenförklaringen
+      # (ggplot2:s eget default lägger annars första nivån överst i
+      # stapeln - då läses stapeln underifrån i omvänd ordning mot
+      # legenden, vilket är svårare att följa).
+      position = ggplot2::position_stack(reverse = TRUE), width = 0.6
     ) +
     ggplot2::scale_fill_manual(
       values = elevhalsa_farg_ramp(length(svar_niva), RD_PRIMARY),
