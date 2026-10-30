@@ -88,6 +88,19 @@ elevhalsa_tom_data <- function() {
   )
 }
 
+# Pedagogisk ordning på åldersgrupper (inte alfabetisk) - används för att
+# ordna x-axeln i diagrammen och listrutan i kommunkarte-fliken.
+ALDERSGRUPP_ORDNING <- c("Förskoleklass", "Åk 4", "Åk 7", "År 1 gymnasiet")
+
+# Ordnar åldersgrupper enligt ALDERSGRUPP_ORDNING; okända värden hamnar
+# sist, alfabetiskt.
+elevhalsa_ordna_aldersgrupp <- function(varden) {
+  varden <- unique(varden)
+  kanda  <- ALDERSGRUPP_ORDNING[ALDERSGRUPP_ORDNING %in% varden]
+  okanda <- sort(setdiff(varden, ALDERSGRUPP_ORDNING))
+  c(kanda, okanda)
+}
+
 # Döljer siffror som bygger på för få svar. Lägger till `litet_urval`
 # (logisk flagga, används för att utesluta staplar i diagrammet) och
 # `andel_visning` (text för KPI-siffror/tabeller).
