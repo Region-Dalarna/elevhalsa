@@ -13,6 +13,9 @@ library(ggplot2)
 library(rdshinyappar)
 library(rdpostgres)
 library(rddiagram)
+library(rdgis)
+library(rdverktyg)
+library(sf)
 
 telemetry <- skapa_telemetry("elevhalsa")
 
@@ -28,8 +31,11 @@ LITET_URVAL_TROSKEL <- 5
 LITET_URVAL_ETIKETT <- "< 5"
 
 # Läs in data en gång vid appstart (inte per session/filterval).
-elevhalsa_data <- elevhalsa_hamta_data() |> elevhalsa_maskera_litet_urval()
-elevhalsa_meta <- elevhalsa_bygg_metadata(elevhalsa_data)
+elevhalsa_data <- elevhalsa_hamta_data() |>
+  elevhalsa_maskera_litet_urval() |>
+  elevhalsa_lagg_till_kommunkod()
+elevhalsa_meta       <- elevhalsa_bygg_metadata(elevhalsa_data)
+elevhalsa_kommunkarta <- elevhalsa_hamta_kommunkarta()
 
 elevhalsa_val_ar          <- sort(unique(elevhalsa_data$ar), decreasing = TRUE)
 elevhalsa_val_aldersgrupp <- sort(unique(elevhalsa_data$aldersgrupp))

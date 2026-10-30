@@ -16,6 +16,19 @@ shinyServer(function(input, output, session) {
     df
   })
 
+  # Samma filter som ovan, men utan regionfiltret - kartan visar alltid
+  # alla kommuner samtidigt.
+  filtrerad_data_alla_kommuner <- reactive({
+    req(input$filter_ar, input$filter_aldersgrupp)
+    df <- elevhalsa_data
+    df <- df[df$ar == input$filter_ar, ]
+    df <- df[df$aldersgrupp == input$filter_aldersgrupp, ]
+    if (!is.null(input$filter_kon) && input$filter_kon != 'Alla') {
+      df <- df[df$kon == input$filter_kon, ]
+    }
+    df
+  })
+
   # Ett set med output$-renderare per kort (topic + variabelnamn + heading).
   # local() behövs så att varje iteration fångar sin egen kort_id/tp/vb/hd -
   # annars skulle alla renderare dela den sista radens värden.
@@ -30,6 +43,14 @@ shinyServer(function(input, output, session) {
       kort_data <- reactive({
         df <- filtrerad_data()
         df[df$topic == tp & df$variabelnamn == vb & df$heading == hd, ]
+      })
+
+      # Kartans data: en rad per kommun, bara den "positiva" svarsraden
+      # (pos_neg == 100) - samma värde som KPI-siffran bygger på.
+      kort_data_kommuner <- reactive({
+        df <- filtrerad_data_alla_kommuner()
+        df <- df[df$topic == tp & df$variabelnamn == vb & df$heading == hd, ]
+        df[!is.na(df$pos_neg) & df$pos_neg == 100, ]
       })
 
       output[[paste0('rubrik_', kort_id)]] <- renderUI(h4(hd))
@@ -49,6 +70,17 @@ shinyServer(function(input, output, session) {
           NULL
         }
         elevhalsa_rita_diagram(df[!df$litet_urval, ], fotnot = fotnot)
+      })
+
+      output[[paste0('karta_', kort_id)]] <- renderPlot({
+        df <- kort_data_kommuner()
+        fotnot <- if (any(df$litet_urval)) {
+          paste0('Kommuner med färre än ', LITET_URVAL_TROSKEL, ' svar visas inte.')
+        } else {
+          NULL
+        }
+        sf_kort <- elevhalsa_bygg_kommun_sf(df[!df$litet_urval, ], elevhalsa_kommunkarta)
+        elevhalsa_rita_karta(sf_kort, fotnot = fotnot)
       })
 
       output[[paste0('analys_', kort_id)]] <- renderUI({

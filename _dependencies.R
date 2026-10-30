@@ -7,5 +7,7 @@ library(dbplyr)
 library(shiny.telemetry)
 library(rdpostgres)
 library(rddiagram)
+library(rdgis)
+library(rdverktyg)
 library(tibble)
 # ... lägg till fler paket vid behov

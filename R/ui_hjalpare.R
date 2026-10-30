@@ -1,12 +1,19 @@
 # UI-byggare: ett "kort" per variabelnamn/heading, och en flik per topic.
 
-# Ett enskilt kort: rubrik, KPI-siffra, diagram och (om ifylld) analystext.
+# Ett enskilt kort: rubrik, KPI-siffra, diagram/karta och (om ifylld)
+# analystext. Diagrammet visar det valda regionfiltret (kommun eller
+# Dalarna totalt); kartan visar alltid alla 15 kommuner samtidigt, så den
+# har ett eget flikval och lyssnar inte på regionfiltret.
 elevhalsa_kort_ui <- function(kort_id) {
   tags$div(
     class = "elevhalsa-kort",
     uiOutput(paste0("rubrik_", kort_id)),
     tags$div(class = "elevhalsa-kort__kpi", textOutput(paste0("kpi_", kort_id))),
-    plotOutput(paste0("diagram_", kort_id), height = "320px"),
+    tabsetPanel(
+      type = "pills",
+      tabPanel("Diagram", plotOutput(paste0("diagram_", kort_id), height = "320px")),
+      tabPanel("Kommunkarta", plotOutput(paste0("karta_", kort_id), height = "420px"))
+    ),
     uiOutput(paste0("analys_", kort_id))
   )
 }

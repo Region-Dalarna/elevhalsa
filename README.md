@@ -16,6 +16,14 @@ Meny-/kortstrukturen (flikar per `topic`, kort per `variabelnamn`/
 `heading`) byggs dynamiskt ur datan - nya frågor/ämnen i tabellen dyker
 upp i appen automatiskt, inget behöver hårdkodas i UI:t.
 
+Varje kort har förutom stapeldiagrammet (filtrerat på valt regionfilter)
+även en kommunkarta (`R/karta.R`) som alltid visar alla 15 kommuner
+samtidigt - datan finns bara på kommunnivå, ingen nivå under, så kartan
+lyssnar inte på regionfiltret i sidopanelen. Kartan visar andelen för
+den rad per kommun där `pos_neg == 100`, samma värde som KPI-siffran.
+Kommunnamnet i `region` kopplas till kommunpolygonerna via kommunkod
+(`rdverktyg::hamta_kommunkoder()` + `rdgis::hamta_karta()`).
+
 **Att stämma av när riktig data finns på plats:** de exakta kolumnnamnen
 (särskilt stavning/skiftläge på t.ex. svarssorteringskolumnen) antogs
 utifrån ett utsnitt av datan - `elevhalsa_std_namn()` matchar oberoende
