@@ -248,8 +248,10 @@ elevhalsa_rita_detalj <- function(df_kort, konsuppdelat) {
       position = "stack", width = 0.6
     ) +
     ggplot2::scale_fill_manual(
-      values = farger, labels = etiketter, name = NULL,
-      breaks = if (any(d$dold)) svar_niva_med_dold else svar_niva
+      # Ingen explicit `breaks` - ggplot2 döljer ändå automatiskt
+      # "Färre än N"-nivån ur legenden i de vyer där inget är dolt
+      # (drop = TRUE är standard för diskreta skalor).
+      values = farger, labels = etiketter, name = NULL
     ) +
     ggplot2::scale_y_continuous(limits = c(0, 100), expand = ggplot2::expansion(mult = c(0, 0.02))) +
     ggplot2::labs(x = NULL, y = "Andel (%)") +
