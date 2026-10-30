@@ -4,16 +4,14 @@ shinyServer(function(input, output, session) {
 
   if (nrow(elevhalsa_meta) == 0) return(invisible(NULL))
 
+  # Kön styrs numera per diagram (Totalt/Könsuppdelat-växlaren), inte av
+  # ett globalt sidopanelsfilter - båda könens rader behövs alltid här.
   filtrerad_data <- reactive({
     req(input$filter_ar, input$filter_aldersgrupp, input$filter_region)
     df <- elevhalsa_data
     df <- df[df$ar == input$filter_ar, ]
     df <- df[df$aldersgrupp == input$filter_aldersgrupp, ]
-    df <- df[df$region == input$filter_region, ]
-    if (!is.null(input$filter_kon) && input$filter_kon != 'Alla') {
-      df <- df[df$kon == input$filter_kon, ]
-    }
-    df
+    df[df$region == input$filter_region, ]
   })
 
   # Samma filter som ovan, men utan regionfiltret - kartan visar alltid
@@ -22,11 +20,7 @@ shinyServer(function(input, output, session) {
     req(input$filter_ar, input$filter_aldersgrupp)
     df <- elevhalsa_data
     df <- df[df$ar == input$filter_ar, ]
-    df <- df[df$aldersgrupp == input$filter_aldersgrupp, ]
-    if (!is.null(input$filter_kon) && input$filter_kon != 'Alla') {
-      df <- df[df$kon == input$filter_kon, ]
-    }
-    df
+    df[df$aldersgrupp == input$filter_aldersgrupp, ]
   })
 
   # Ett set med output$-renderare per topic/flik - inte per indikator.
@@ -39,6 +33,7 @@ shinyServer(function(input, output, session) {
       tp_lokal  <- tp
       slug      <- elevhalsa_slug(tp_lokal)
       val_input <- paste0('val_', slug)
+      kon_input <- paste0('konval_', slug)
 
       vald_rad <- reactive({
         req(input[[val_input]])
@@ -52,25 +47,39 @@ shinyServer(function(input, output, session) {
         df[df$topic == rad$topic & df$variabelnamn == rad$variabelnamn & df$heading == rad$heading, ]
       })
 
-      # Kartans data: en rad per kommun, bara den "positiva" svarsraden
-      # (pos_neg == 100) - samma värde som KPI-siffran bygger på.
+      # Totalt över båda könen, för vald region - används av KPI-siffran
+      # och av diagrammet när "Totalt" är valt.
+      kort_data_totalt <- reactive(elevhalsa_summera_totalt(kort_data()))
+
+      # Kartans data: en rad per kommun, totalt över båda könen, bara den
+      # "positiva" svarsraden (pos_neg == 100) - samma värde som
+      # KPI-siffran bygger på.
       kort_data_kommuner <- reactive({
         rad <- vald_rad()
         req(nrow(rad) == 1)
         df <- filtrerad_data_alla_kommuner()
         df <- df[df$topic == rad$topic & df$variabelnamn == rad$variabelnamn & df$heading == rad$heading, ]
-        df[!is.na(df$pos_neg) & df$pos_neg == 100, ]
+        if (nrow(df) == 0) return(df)
+        df |>
+          dplyr::group_by(dplyr::across(dplyr::any_of(c("region", "kommunkod")))) |>
+          dplyr::group_modify(~ elevhalsa_summera_totalt(.x)) |>
+          dplyr::ungroup() |>
+          dplyr::filter(!is.na(.data$pos_neg) & .data$pos_neg == 100)
       })
 
       output[[paste0('kpi_', slug)]] <- renderText({
-        df <- kort_data()
+        df <- kort_data_totalt()
         rad_kpi <- df[!is.na(df$pos_neg) & df$pos_neg == 100, ]
         if (nrow(rad_kpi) == 0) return(NULL)
         rad_kpi$andel_visning[1]
       })
 
       output[[paste0('diagram_', slug)]] <- ggiraph::renderGirafe({
-        elevhalsa_rita_diagram(kort_data())
+        if (identical(input[[kon_input]], 'Könsuppdelat')) {
+          elevhalsa_rita_diagram_kon(kort_data())
+        } else {
+          elevhalsa_rita_diagram(kort_data_totalt())
+        }
       })
 
       output[[paste0('karta_', slug)]] <- ggiraph::renderGirafe({

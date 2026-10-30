@@ -35,6 +35,18 @@ med `dplyr`/`dbplyr` mot `karta.kommun_scb` och görs om till `sf` med
 med för få individer (`litet_urval`) ritas som gråa platshållare med
 `< 5` i tooltipen istället för att visa sitt riktiga värde.
 
+Diagrammet har en Totalt/Könsuppdelat-växlare (`R/diagram.R`), som i
+`utbildning`-appen - men till skillnad från den appens antalsdiagram
+visas könen sida vid sida (dodge), inte staplade, eftersom andelar inte
+är additiva. "Totalt" använder en befintlig `kon == "Totalt"`-rad om
+datan har en sådan, annars summeras Flickor/Pojkar ihop och andelen
+räknas om (`elevhalsa_summera_totalt()`). Kön är inte längre ett
+sidopanelsfilter - det styrs per diagram.
+
+Åldersgrupp-filtret väljer "Årskurs 7" som standard om det finns i
+datan (`elevhalsa_standardval()` i `R/ui_hjalpare.R`), så appen visar
+data direkt vid start istället för den alfabetiskt första åldersgruppen.
+
 **Att stämma av när riktig data finns på plats:** de exakta kolumnnamnen
 (särskilt stavning/skiftläge på t.ex. svarssorteringskolumnen) antogs
 utifrån ett utsnitt av datan - `elevhalsa_std_namn()` matchar oberoende

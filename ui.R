@@ -33,8 +33,8 @@ shinyUI(
       sidebarLayout(
         sidebarPanel(
           selectInput('filter_ar', 'År', choices = elevhalsa_val_ar),
-          selectInput('filter_aldersgrupp', 'Åldersgrupp', choices = elevhalsa_val_aldersgrupp),
-          selectInput('filter_kon', 'Kön', choices = c('Alla', elevhalsa_val_kon)),
+          selectInput('filter_aldersgrupp', 'Åldersgrupp', choices = elevhalsa_val_aldersgrupp,
+                     selected = elevhalsa_standardval_aldersgrupp),
           selectInput('filter_region', 'Region', choices = elevhalsa_val_region)
         ),
         mainPanel(
