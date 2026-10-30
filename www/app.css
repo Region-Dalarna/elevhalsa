@@ -12,28 +12,26 @@
   margin-bottom: 1.5rem;
 }
 
-.elevhalsa-kort__kpi {
-  font-size: 1.8rem;
-  font-weight: 600;
-}
-
 .elevhalsa-tom {
   max-width: 40rem;
   margin: 3rem auto;
   text-align: center;
 }
 
+/* Ämnestexten ligger i sidopanelen (ui.R), inte i huvudytan - smalare
+   och mindre text än om den låg bredvid diagrammen. */
 .elevhalsa-amnestext {
-  max-width: 60rem;
-  margin: 1rem 0 1.5rem;
-  padding: 0.75rem 1.25rem;
+  margin: 1.25rem 0 0;
+  padding: 0.75rem 1rem;
   background: #f7f9fa;
   border-left: 3px solid var(--rd-primary, #158daf);
   border-radius: 0 4px 4px 0;
+  font-size: 0.85rem;
+  line-height: 1.45;
 }
 
 .elevhalsa-amnestext p {
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.6rem;
 }
 
 .elevhalsa-amnestext p:last-child {

@@ -1,53 +1,57 @@
-# UI-byggare: en flik per topic, med en ämnestext överst (se
-# R/amnestexter.R), en listruta för att välja indikator
+# UI-byggare: en flik per topic, med en listruta för att välja indikator
 # (variabelnamn/heading) inom topicen och en gemensam yta som alltid
 # visar den valda indikatorn - inte alla staplade under varandra.
 # Åldersgrupp är en grupperingsdimension i diagrammen (se R/diagram.R),
 # inte ett sidopanelsfilter - bara kommunkartan har en egen
 # åldersgrupp-väljare, eftersom en karta bara kan visa en åldersgrupp
 # åt gången.
+#
+# Ämnestexten ("Kort om frågeområdet") visas INTE här i huvudytan - den
+# ligger i sidopanelen (ui.R), reaktiv mot vilken flik som är aktiv, så
+# diagrammen får hela huvudytan för sig själva.
 
 # Gör om en text till ett giltigt, stabilt input/output-id.
 elevhalsa_slug <- function(x) gsub("[^A-Za-z0-9]+", "_", x)
 
-# En flik per topic: ämnestext + listruta + den gemensamma kort-ytan.
+# En flik per topic: listruta + den gemensamma kort-ytan.
 elevhalsa_bygg_flikar <- function(meta) {
   if (nrow(meta) == 0) return(list())
   lapply(unique(meta$topic), function(tp) {
     slug  <- elevhalsa_slug(tp)
     rader <- meta[meta$topic == tp, ]
     val   <- stats::setNames(rader$kort_id, rader$heading)
-    txt   <- elevhalsa_hamta_amnestext(tp)
     tabPanel(
       tp,
-      if (length(txt) > 0) {
-        tags$div(class = "elevhalsa-amnestext", lapply(txt, function(t) tags$p(shiny::HTML(t))))
-      },
       selectInput(paste0("val_", slug), NULL, choices = val, width = "100%"),
       elevhalsa_kort_ui(slug)
     )
   })
 }
 
-# Ytan för en flik: KPI-siffra, totalt/könsuppdelat-växlare (som i
-# utbildning-appen, gäller Diagram + Alla svarsalternativ) och
-# diagram/detalj/karta-flikar - fylls med innehåll för den indikator som
-# är vald i flikens listruta. Kommunkartan visar alltid totalt per kommun
-# och har en egen åldersgrupp-väljare.
+# Ytan för en flik: frågerubrik, totalt/könsuppdelat-växlare (som i
+# utbildning-appen) och två flikar - Diagram (med en inbyggd
+# sammanfattning/alla svar-växlare) och Karta. Kartan visar alltid
+# totalt per kommun och har en egen åldersgrupp-väljare.
 elevhalsa_kort_ui <- function(slug) {
   tags$div(
     class = "elevhalsa-kort",
-    tags$div(class = "elevhalsa-kort__kpi", textOutput(paste0("kpi_", slug))),
+    uiOutput(paste0("rubrik_", slug)),
     shinyWidgets::radioGroupButtons(
       paste0("konval_", slug), label = NULL,
       choices = c("Totalt", "Könsuppdelat"), selected = "Totalt", size = "sm"
     ),
     tabsetPanel(
       type = "pills",
-      tabPanel("Diagram", ggiraph::girafeOutput(paste0("diagram_", slug), height = "420px")),
-      tabPanel("Alla svarsalternativ", ggiraph::girafeOutput(paste0("detalj_", slug), height = "420px")),
       tabPanel(
-        "Kommunkarta",
+        "Diagram",
+        shinyWidgets::radioGroupButtons(
+          paste0("vyval_", slug), label = NULL,
+          choices = c("Sammanfattning", "Alla svar"), selected = "Sammanfattning", size = "sm"
+        ),
+        ggiraph::girafeOutput(paste0("diagram_", slug), height = "420px")
+      ),
+      tabPanel(
+        "Karta",
         selectInput(
           paste0("karta_aldersgrupp_", slug), "Åldersgrupp",
           choices = elevhalsa_val_aldersgrupp, selected = elevhalsa_standardval_aldersgrupp

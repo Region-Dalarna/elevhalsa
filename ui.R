@@ -33,7 +33,8 @@ shinyUI(
       sidebarLayout(
         sidebarPanel(
           selectInput('filter_ar', 'År', choices = elevhalsa_val_ar),
-          selectInput('filter_region', 'Region', choices = elevhalsa_val_region)
+          selectInput('filter_region', 'Region', choices = elevhalsa_val_region),
+          uiOutput('sidopanel_amnestext')
         ),
         mainPanel(
           do.call(tabsetPanel, c(

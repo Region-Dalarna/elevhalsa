@@ -4,6 +4,13 @@ shinyServer(function(input, output, session) {
 
   if (nrow(elevhalsa_meta) == 0) return(invisible(NULL))
 
+  # Ämnestexten i sidopanelen följer vilken flik som är aktiv.
+  output$sidopanel_amnestext <- renderUI({
+    txt <- elevhalsa_hamta_amnestext(input$flikval)
+    if (length(txt) == 0) return(NULL)
+    tags$div(class = 'elevhalsa-amnestext', lapply(txt, function(t) tags$p(shiny::HTML(t))))
+  })
+
   # Bas-filter: år + region. Åldersgrupp visas som grupperingsdimension i
   # diagrammen (inte ett filter) - kön styrs per diagram (Totalt/
   # Könsuppdelat-växlaren).
@@ -32,6 +39,7 @@ shinyServer(function(input, output, session) {
       slug      <- elevhalsa_slug(tp_lokal)
       val_input <- paste0('val_', slug)
       kon_input <- paste0('konval_', slug)
+      vy_input  <- paste0('vyval_', slug)
       karta_aldersgrupp_input <- paste0('karta_aldersgrupp_', slug)
 
       vald_rad <- reactive({
@@ -47,14 +55,13 @@ shinyServer(function(input, output, session) {
         df[df$topic == rad$topic & df$variabelnamn == rad$variabelnamn & df$heading == rad$heading, ]
       })
 
-      # Totalt över båda könen (alla åldersgrupper) - används av
-      # KPI-siffran och den förenklade "Totalt"-vyn.
+      # Totalt över båda könen (alla åldersgrupper) - används av den
+      # förenklade "Totalt"-vyn.
       kort_data_totalt <- reactive(elevhalsa_summera_totalt(kort_data()))
 
       # Kartans data: en rad per kommun, för den åldersgrupp som är vald i
       # kartflikens egen väljare - totalt över båda könen, bara den
-      # "positiva" svarsraden (pos_neg == 100), samma värde som
-      # KPI-siffran bygger på.
+      # "positiva" svarsraden (pos_neg == 100).
       kort_data_kommuner <- reactive({
         rad <- vald_rad()
         req(nrow(rad) == 1, input[[karta_aldersgrupp_input]])
@@ -65,27 +72,21 @@ shinyServer(function(input, output, session) {
         df[!is.na(df$pos_neg) & df$pos_neg == 100, ]
       })
 
-      output[[paste0('kpi_', slug)]] <- renderText({
-        df <- kort_data_totalt()
-        rad_kpi <- df[!is.na(df$pos_neg) & df$pos_neg == 100, ]
-        if (nrow(rad_kpi) == 0) return(NULL)
-        # Visar helst Åk 7 (eller första tillgängliga åldersgrupp i den
-        # pedagogiska ordningen) som snabb sammanfattning - diagrammet
-        # nedanför visar alla åldersgrupper.
-        rad_kpi <- rad_kpi[order(match(rad_kpi$aldersgrupp, elevhalsa_val_aldersgrupp)), ]
-        paste0(rad_kpi$aldersgrupp[1], ": ", rad_kpi$andel_visning[1])
+      output[[paste0('rubrik_', slug)]] <- renderUI({
+        rad <- vald_rad()
+        req(nrow(rad) == 1)
+        h4(rad$heading)
       })
 
       output[[paste0('diagram_', slug)]] <- ggiraph::renderGirafe({
-        if (identical(input[[kon_input]], 'Könsuppdelat')) {
+        konsuppdelat <- identical(input[[kon_input]], 'Könsuppdelat')
+        if (identical(input[[vy_input]], 'Alla svar')) {
+          elevhalsa_rita_detalj(kort_data(), konsuppdelat)
+        } else if (konsuppdelat) {
           elevhalsa_rita_diagram_kon(kort_data())
         } else {
           elevhalsa_rita_diagram(kort_data_totalt())
         }
-      })
-
-      output[[paste0('detalj_', slug)]] <- ggiraph::renderGirafe({
-        elevhalsa_rita_detalj(kort_data(), identical(input[[kon_input]], 'Könsuppdelat'))
       })
 
       output[[paste0('karta_', slug)]] <- ggiraph::renderGirafe({
