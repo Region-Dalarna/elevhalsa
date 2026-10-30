@@ -120,7 +120,12 @@ elevhalsa_rita_diagram <- function(df_totalt) {
       width = 0.6
     ) +
     ggplot2::scale_fill_identity() +
-    ggplot2::scale_y_continuous(limits = c(0, 100), expand = ggplot2::expansion(mult = c(0, 0.06))) +
+    # oob = scales::squish klämmer in avrundningsfel (t.ex. 100.4 %) till
+    # 100 istället för att tappa bort stapeln helt, vilket scale_y_continuous
+    # annars gör (standardbeteendet censurerar/NA:ar värden utanför limits).
+    ggplot2::scale_y_continuous(
+      limits = c(0, 100), expand = ggplot2::expansion(mult = c(0, 0.06)), oob = scales::squish
+    ) +
     ggplot2::labs(
       x = NULL, y = "Andel (%)",
       caption = if (any(d$litet_urval)) {
@@ -166,7 +171,9 @@ elevhalsa_rita_diagram_kon <- function(df_kort) {
       breaks = c(names(KON_FARGER), if (any(d$litet_urval)) dold_namn),
       name = NULL
     ) +
-    ggplot2::scale_y_continuous(limits = c(0, 100), expand = ggplot2::expansion(mult = c(0, 0.06))) +
+    ggplot2::scale_y_continuous(
+      limits = c(0, 100), expand = ggplot2::expansion(mult = c(0, 0.06)), oob = scales::squish
+    ) +
     ggplot2::labs(
       x = NULL, y = "Andel (%)",
       caption = if (any(d$litet_urval)) {
@@ -189,10 +196,14 @@ elevhalsa_rita_diagram_kon <- function(df_kort) {
 # summerar till 100 % per åldersgrupp/kön, så staplingen är bara en
 # visualisering av redan färdiga andelar - ingen beräkning.
 #
-# Förenkling jämfört med originalrapporten: där fick Flickor/Pojkar varsin
-# färgskala (orange/grön-nyanser). Här delar båda könen samma färgskala
-# (RD-grön) och skiljs åt med ett facet-stripe-namn istället - ggplot2 har
-# inget enkelt sätt att ge varje facet-panel en egen fyllnadsskala.
+# Vid Könsuppdelat får Flickor/Pojkar varsin färgskala (orange/gröna
+# nyanser, samma baskulörer som KON_FARGER) istället för att dela en
+# gemensam - som i originalrapporten. ggplot2 har ingen inbyggd "en skala
+# per facet", så det löses med ggnewscale::new_scale_fill(): två separata
+# geom_col_interactive-lager (ett per kön, förfiltrerat) med var sin
+# scale_fill_manual() emellan. Varje facet-panel visar bara sitt eget
+# lager (den andra könets lager har inga rader där), så resultatet blir
+# två färgskalor och två namngivna legender ("Flickor"/"Pojkar").
 #
 # Enstaka svarsalternativ kan vara maskerade direkt i databasen (andel =
 # NA) även om hela frågegruppen (grupp_n) är stor nog för att inte
@@ -241,36 +252,78 @@ elevhalsa_rita_detalj <- function(df_kort, konsuppdelat) {
   # automatiskt oanvända "Färre än N"-nivån ur skalan när inget är dolt,
   # vilket med en onamngiven vektor skulle förskjuta alla efterföljande
   # färger/etiketter ett steg och göra att t.ex. "Nej" fick fel färg.
+  # Namngivna vektorer (inte positionella) - annars droppar ggplot2
+  # automatiskt oanvända "Färre än N"-nivån ur skalan när inget är dolt,
+  # vilket med en onamngiven vektor skulle förskjuta alla efterföljande
+  # färger/etiketter ett steg och göra att t.ex. "Nej" fick fel färg.
   etiketter <- stats::setNames(
     vapply(svar_niva, function(x) paste(strwrap(x, width = 22), collapse = "\n"), character(1)),
     svar_niva
   )
   etiketter[dold_namn] <- dold_namn
 
-  farger <- stats::setNames(elevhalsa_farg_ramp(length(svar_niva), RD_PRIMARY), svar_niva)
-  farger[dold_namn] <- LITET_URVAL_FARG
-
-  g <- ggplot2::ggplot(d, ggplot2::aes(x = .data$aldersgrupp, y = .data$varde, fill = .data$svar)) +
-    ggiraph::geom_col_interactive(
-      ggplot2::aes(tooltip = .data$tooltip, data_id = .data$data_id),
-      # Standardstaplingen (ingen reverse) lägger redan första
-      # svarsnivån överst i stapeln, samma nivå som står överst i den
-      # vertikala teckenförklaringen - de två läses alltså redan i samma
-      # ordning uppifrån och ner.
-      position = "stack", width = 0.6
-    ) +
-    ggplot2::scale_fill_manual(
-      # Ingen explicit `breaks` - ggplot2 döljer ändå automatiskt
-      # "Färre än N"-nivån ur legenden i de vyer där inget är dolt
-      # (drop = TRUE är standard för diskreta skalor).
-      values = farger, labels = etiketter, name = NULL
-    ) +
-    ggplot2::scale_y_continuous(limits = c(0, 100), expand = ggplot2::expansion(mult = c(0, 0.02))) +
-    ggplot2::labs(x = NULL, y = "Andel (%)") +
-    elevhalsa_tema() +
+  tema_gemensam <- list(
+    # oob = scales::squish klämmer in avrundningsfel (t.ex. 100.4 %) till
+    # 100 istället för att tappa bort raden helt (standardbeteendet
+    # censurerar/NA:ar värden utanför limits).
+    ggplot2::scale_y_continuous(limits = c(0, 100), expand = ggplot2::expansion(mult = c(0, 0.02)), oob = scales::squish),
+    ggplot2::labs(x = NULL, y = "Andel (%)"),
+    elevhalsa_tema(),
     ggplot2::theme(legend.position = "right", legend.text = ggplot2::element_text(size = 9))
+  )
 
-  if (konsuppdelat) g <- g + ggplot2::facet_wrap(~ kon)
+  if (!konsuppdelat) {
+    farger <- stats::setNames(elevhalsa_farg_ramp(length(svar_niva), RD_PRIMARY), svar_niva)
+    farger[dold_namn] <- LITET_URVAL_FARG
+
+    g <- ggplot2::ggplot(d, ggplot2::aes(x = .data$aldersgrupp, y = .data$varde, fill = .data$svar)) +
+      ggiraph::geom_col_interactive(
+        ggplot2::aes(tooltip = .data$tooltip, data_id = .data$data_id),
+        # Standardstaplingen (ingen reverse) lägger redan första
+        # svarsnivån överst i stapeln, samma nivå som står överst i den
+        # vertikala teckenförklaringen - de två läses alltså redan i samma
+        # ordning uppifrån och ner.
+        position = "stack", width = 0.6
+      ) +
+      ggplot2::scale_fill_manual(
+        # Ingen explicit `breaks` - ggplot2 döljer ändå automatiskt
+        # "Färre än N"-nivån ur legenden när inget är dolt (drop = TRUE
+        # är standard för diskreta skalor).
+        values = farger, labels = etiketter, name = NULL
+      ) +
+      tema_gemensam
+  } else {
+    bygg_farger <- function(bas) {
+      f <- stats::setNames(elevhalsa_farg_ramp(length(svar_niva), bas), svar_niva)
+      f[dold_namn] <- LITET_URVAL_FARG
+      f
+    }
+    farger_flickor <- bygg_farger(KON_FARGER[["Flickor"]])
+    farger_pojkar  <- bygg_farger(KON_FARGER[["Pojkar"]])
+
+    g <- ggplot2::ggplot() +
+      ggiraph::geom_col_interactive(
+        data = d[d$kon == "Flickor", ],
+        ggplot2::aes(
+          x = .data$aldersgrupp, y = .data$varde, fill = .data$svar,
+          tooltip = .data$tooltip, data_id = .data$data_id
+        ),
+        position = "stack", width = 0.6
+      ) +
+      ggplot2::scale_fill_manual(values = farger_flickor, labels = etiketter, name = "Flickor") +
+      ggnewscale::new_scale_fill() +
+      ggiraph::geom_col_interactive(
+        data = d[d$kon == "Pojkar", ],
+        ggplot2::aes(
+          x = .data$aldersgrupp, y = .data$varde, fill = .data$svar,
+          tooltip = .data$tooltip, data_id = .data$data_id
+        ),
+        position = "stack", width = 0.6
+      ) +
+      ggplot2::scale_fill_manual(values = farger_pojkar, labels = etiketter, name = "Pojkar") +
+      ggplot2::facet_wrap(~ kon) +
+      tema_gemensam
+  }
 
   elevhalsa_girafe(g, width_svg = 9, height_svg = 5, hover_css = RD_HOVER_CSS_FLERFARGAD)
 }

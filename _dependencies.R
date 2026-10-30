@@ -7,4 +7,5 @@ library(dbplyr)
 library(shiny.telemetry)
 library(rdverktyg)
 library(tibble)
+library(ggnewscale)
 # ... lägg till fler paket vid behov
