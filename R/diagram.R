@@ -25,13 +25,17 @@ elevhalsa_tema <- function() {
 }
 
 # Standardiserad girafe-inkapsling (hover/tooltip/verktygsfält), samma
-# mönster som utbildning/R/func_diagram.R:.girafe_std().
+# mönster som utbildning/R/func_diagram.R:.girafe_std(). Klick-markering
+# är avstängd (opts_selection "none") - vi använder den inte till något
+# (ingen korsfiltrering), så den skulle bara vara en förvirrande
+# kvardröjande effekt om den stod på som ggiraphs standard.
 elevhalsa_girafe <- function(g, width_svg = 7, height_svg = 4.5) {
   ggiraph::girafe(
     ggobj = g, width_svg = width_svg, height_svg = height_svg,
     options = list(
       ggiraph::opts_hover(css = RD_HOVER_CSS),
       ggiraph::opts_tooltip(css = RD_TOOLTIP_CSS),
+      ggiraph::opts_selection(type = "none"),
       ggiraph::opts_sizing(rescale = TRUE, width = 1),
       ggiraph::opts_toolbar(saveaspng = TRUE, hidden = c("lasso_select", "lasso_deselect"))
     )

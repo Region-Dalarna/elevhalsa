@@ -18,14 +18,17 @@ valda indikatorn visas, inte alla staplade under varandra. Nya
 frågor/ämnen i tabellen dyker upp i appen automatiskt, inget behöver
 hårdkodas i UI:t.
 
-Varje flik har tre vyer: ett förenklat diagram (headline-andelen,
-`pos_neg == 100`), en detaljerad vy med alla ursprungliga svarsalternativ
-(100 %-staplat) och en kommunkarta (`R/karta.R`) som alltid visar alla 15
-kommuner samtidigt - datan finns bara på kommunnivå, ingen nivå under, så
-kartan lyssnar inte på regionfiltret i sidopanelen, och har en egen
-åldersgrupp-väljare (en karta kan bara visa en åldersgrupp åt gången).
-Kommunnamnet i `region` kopplas till kommunpolygonerna via kommunkod
-(`rdverktyg::hamta_kommunkoder()`).
+Varje flik har två vyer: **Diagram** (med en inbyggd
+Sammanfattning/Alla svar-växlare - headline-andelen `pos_neg == 100`
+respektive alla ursprungliga svarsalternativ, 100 %-staplat) och
+**Karta** (`R/karta.R`), som alltid visar alla 15 kommuner samtidigt -
+datan finns bara på kommunnivå, ingen nivå under, så kartan lyssnar inte
+på regionfiltret i sidopanelen, och har en egen åldersgrupp-väljare (en
+karta kan bara visa en åldersgrupp åt gången). Kommunnamnet i `region`
+kopplas till kommunpolygonerna via kommunkod
+(`rdverktyg::hamta_kommunkoder()`). Klick-markering i diagrammen är
+avstängd (`opts_selection(type = "none")`) - bara mouseover-tooltip
+används, ingen korsfiltrering.
 
 Åldersgrupp är INTE ett filter längre - den visas som
 grupperingsdimension på x-axeln i diagrammen (Förskoleklass/Åk 4/Åk 7/
@@ -35,10 +38,12 @@ R/data.R). Inspirerat av den tidigare Power BI-rapporten, som visade
 årskurserna sida vid sida istället för som ett filter som döljer de
 andra.
 
-Varje flik har en ämnestext överst ("Kort om frågeområdet", som i den
-tidigare rapporten) - redaktionellt innehåll från Samhällsanalys,
-hårdkodat i `R/amnestexter.R` (inte läst ur `analys`-kolumnen i
-databasen, som bara innehöll platshållartext).
+Ämnestexten ("Kort om frågeområdet") ligger i sidopanelen (inte inline
+ovanför diagrammen, så de får huvudytan för sig själva), reaktiv mot
+vilken flik som är aktiv (`output$sidopanel_amnestext` i server.R).
+Innehållet är redaktionellt från Samhällsanalys, hårdkodat i
+`R/amnestexter.R` (inte läst ur `analys`-kolumnen i databasen, som bara
+innehöll platshållartext).
 
 Diagram och karta är ren `ggplot2` + `ggiraph` (`geom_col_interactive`/
 `geom_sf_interactive`), enligt samma mönster som `utbildning`
