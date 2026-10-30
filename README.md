@@ -63,6 +63,15 @@ för standardbeteendet (som NA:ar/tappar bort hela raden om en stapels
 summa hamnar även marginellt över 100 % på grund av avrundning i
 databasen).
 
+De staplade diagrammen i `elevhalsa_rita_detalj()` sätter `group =
+svar` explicit i `aes()`. Utan det räknar ggplot2 ut grupperingen som
+en interaktion av ALLA diskreta aesthetics i lagret - inklusive
+`tooltip` och `data_id`, som är unika per rad - och sorterar den
+interaktionen i bokstavsordning på den sammansatta texten istället för
+i `svar`-faktorns avsedda ordning. Resultatet blev en stapelordning som
+inte gick att få att stämma med teckenförklaringen oavsett hur
+färgskalan justerades (verifierat med `ggplot_build()`).
+
 Diagrammet har en Totalt/Könsuppdelat-växlare (`R/diagram.R`), som i
 `utbildning`-appen - men till skillnad från den appens antalsdiagram
 visas könen sida vid sida (dodge), inte staplade, eftersom andelar inte

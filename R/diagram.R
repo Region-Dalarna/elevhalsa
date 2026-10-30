@@ -276,13 +276,22 @@ elevhalsa_rita_detalj <- function(df_kort, konsuppdelat) {
     farger <- stats::setNames(elevhalsa_farg_ramp(length(svar_niva), RD_PRIMARY), svar_niva)
     farger[dold_namn] <- LITET_URVAL_FARG
 
-    g <- ggplot2::ggplot(d, ggplot2::aes(x = .data$aldersgrupp, y = .data$varde, fill = .data$svar)) +
+    g <- ggplot2::ggplot(d, ggplot2::aes(x = .data$aldersgrupp, y = .data$varde, fill = .data$svar, group = .data$svar)) +
       ggiraph::geom_col_interactive(
         ggplot2::aes(tooltip = .data$tooltip, data_id = .data$data_id),
         # Standardstaplingen (ingen reverse) lägger redan första
         # svarsnivån överst i stapeln, samma nivå som står överst i den
         # vertikala teckenförklaringen - de två läses alltså redan i samma
         # ordning uppifrån och ner.
+        #
+        # group = svar är nödvändigt (inte bara kosmetiskt): utan explicit
+        # group räknar ggplot2 ut grupperingen som en interaktion av ALLA
+        # diskreta aesthetics i lagret - inklusive tooltip och data_id, som
+        # är unika per rad. Den interaktionens kategorier sorteras då i
+        # bokstavsordning på tooltip-texten, INTE i svar-faktorns ordning,
+        # vilket gav en stapelordning som verkade slumpmässig och omöjlig
+        # att få att stämma med teckenförklaringen oavsett vad som
+        # justerades i färgskalan.
         position = "stack", width = 0.6
       ) +
       ggplot2::scale_fill_manual(
@@ -305,9 +314,13 @@ elevhalsa_rita_detalj <- function(df_kort, konsuppdelat) {
       ggiraph::geom_col_interactive(
         data = d[d$kon == "Flickor", ],
         ggplot2::aes(
-          x = .data$aldersgrupp, y = .data$varde, fill = .data$svar,
+          x = .data$aldersgrupp, y = .data$varde, fill = .data$svar, group = .data$svar,
           tooltip = .data$tooltip, data_id = .data$data_id
         ),
+        # group = svar - se kommentar vid motsvarande geom_col_interactive
+        # i grenen ovan (!konsuppdelat): utan den grupperas staplingen
+        # efter tooltip/data_id i bokstavsordning istället för svar-
+        # faktorns ordning.
         position = "stack", width = 0.6
       ) +
       ggplot2::scale_fill_manual(values = farger_flickor, labels = etiketter, name = "Flickor") +
@@ -315,7 +328,7 @@ elevhalsa_rita_detalj <- function(df_kort, konsuppdelat) {
       ggiraph::geom_col_interactive(
         data = d[d$kon == "Pojkar", ],
         ggplot2::aes(
-          x = .data$aldersgrupp, y = .data$varde, fill = .data$svar,
+          x = .data$aldersgrupp, y = .data$varde, fill = .data$svar, group = .data$svar,
           tooltip = .data$tooltip, data_id = .data$data_id
         ),
         position = "stack", width = 0.6
