@@ -38,10 +38,11 @@ med för få individer (`litet_urval`) ritas som gråa platshållare med
 Diagrammet har en Totalt/Könsuppdelat-växlare (`R/diagram.R`), som i
 `utbildning`-appen - men till skillnad från den appens antalsdiagram
 visas könen sida vid sida (dodge), inte staplade, eftersom andelar inte
-är additiva. "Totalt" använder en befintlig `kon == "Totalt"`-rad om
-datan har en sådan, annars summeras Flickor/Pojkar ihop och andelen
-räknas om (`elevhalsa_summera_totalt()`). Kön är inte längre ett
-sidopanelsfilter - det styrs per diagram.
+är additiva. "Totalt" plockar bara ut den befintliga `kon == "Totalt"`-
+raden (`elevhalsa_summera_totalt()`) - andelar räknas aldrig om eller
+summeras fram i appen, alla andelar är redan färdigberäknade i
+databasen. Kön är inte längre ett sidopanelsfilter - det styrs per
+diagram.
 
 Åldersgrupp-filtret väljer "Årskurs 7" som standard om det finns i
 datan (`elevhalsa_standardval()` i `R/ui_hjalpare.R`), så appen visar

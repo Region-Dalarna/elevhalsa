@@ -82,37 +82,12 @@ elevhalsa_rita_diagram <- function(df_kort) {
   elevhalsa_girafe(g)
 }
 
-# Slår ihop ett korts data (en rad per kön/svarsalternativ, för EN
-# kommun/region) till en totalsiffra över båda könen - en rad per
-# svarsalternativ. Använder en befintlig "Totalt"-rad i datan om den
-# finns, annars summeras antal över Flickor/Pojkar och andelen räknas om
-# (grupp_n hämtas en gång per kön innan summeringen, eftersom samma
-# grupp_n annars skulle räknas flera gånger - en gång per svarsalternativ).
+# Plockar ut totalraden (kon == "Totalt") ur ett korts data. Andelar
+# räknas INTE om eller summeras fram här - alla andelar i elevhalsa_data
+# är redan färdigberäknade i databasen, så funktionen filtrerar bara.
+# Ger en tom data.frame om ingen Totalt-rad finns för den här kombinationen.
 elevhalsa_summera_totalt <- function(df_kort) {
-  if (nrow(df_kort) == 0) return(df_kort)
-  if ("Totalt" %in% df_kort$kon) {
-    return(df_kort[df_kort$kon == "Totalt", ])
-  }
-
-  grupp_n_per_kon <- unique(df_kort[, c("kon", "grupp_n")])
-  grupp_n_tot <- sum(grupp_n_per_kon$grupp_n, na.rm = TRUE)
-
-  tot <- df_kort |>
-    dplyr::group_by(dplyr::across(dplyr::any_of(c(
-      "svar_forenklat", "sortering_svar", "pos_neg", "heading",
-      "variabelnamn", "topic", "ar", "aldersgrupp", "region", "kommunkod"
-    )))) |>
-    dplyr::summarise(antal = sum(.data$antal, na.rm = TRUE), .groups = "drop") |>
-    dplyr::mutate(
-      kon     = "Totalt",
-      grupp_n = grupp_n_tot,
-      # grupp_n_tot är ett skalärt värde (samma för alla rader här) - ifelse()
-      # med ett skalärt villkor returnerar bara EN rad och skulle göra att
-      # alla rader fick samma andel, så ett vanligt if/else används istället.
-      andel   = if (grupp_n_tot > 0) 100 * .data$antal / grupp_n_tot else NA_real_
-    )
-
-  elevhalsa_maskera_litet_urval(tot)
+  df_kort[df_kort$kon == "Totalt", ]
 }
 
 # Könsuppdelat stapeldiagram: Flickor/Pojkar sida vid sida per
