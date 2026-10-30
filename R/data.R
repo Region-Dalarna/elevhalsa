@@ -29,7 +29,7 @@ elevhalsa_hamta_data <- function() {
     return(elevhalsa_tom_data())
   }
 
-  elevhalsa_std_namn(df)
+  elevhalsa_std_namn(df) |> elevhalsa_koerce_numeriska()
 }
 
 # Kolumnnamnen i databasen kan skilja sig något i skiftläge/stavning mot vad
@@ -60,6 +60,19 @@ elevhalsa_std_namn <- function(df) {
   for (nytt in names(alias)) {
     traff <- which(namn_lower %in% alias[[nytt]])
     if (length(traff) == 1) names(df)[traff] <- nytt
+  }
+  df
+}
+
+# Kolumner som ska vara numeriska kan komma tillbaka som text från
+# databasen (t.ex. om de lagts in som varchar, eller med decimalkomma
+# istället för decimalpunkt) - tvinga om till numeriskt.
+elevhalsa_koerce_numeriska <- function(df) {
+  num_kol <- c("antal", "andel", "grupp_n", "pos_neg", "sortering_svar", "sortering_region")
+  for (kol in intersect(num_kol, names(df))) {
+    if (!is.numeric(df[[kol]])) {
+      df[[kol]] <- as.numeric(gsub(",", ".", df[[kol]], fixed = TRUE))
+    }
   }
   df
 }
