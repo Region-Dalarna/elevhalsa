@@ -54,6 +54,15 @@ med `dplyr`/`dbplyr` mot `karta.kommun_scb` och görs om till `sf` med
 med för få individer (`litet_urval`) ritas som gråa platshållare med
 `< 5` i tooltipen istället för att visa sitt riktiga värde.
 
+I "Alla svar"-vyn (`elevhalsa_rita_detalj()`) får Flickor/Pojkar varsin
+färgskala vid Könsuppdelat (orange/gröna nyanser, som i
+originalrapporten) via `ggnewscale::new_scale_fill()` - ggplot2 saknar
+inbyggt stöd för en skala per facet-panel. `scale_y_continuous(limits
+= c(0, 100))` i alla diagram använder `oob = scales::squish` istället
+för standardbeteendet (som NA:ar/tappar bort hela raden om en stapels
+summa hamnar även marginellt över 100 % på grund av avrundning i
+databasen).
+
 Diagrammet har en Totalt/Könsuppdelat-växlare (`R/diagram.R`), som i
 `utbildning`-appen - men till skillnad från den appens antalsdiagram
 visas könen sida vid sida (dodge), inte staplade, eftersom andelar inte
