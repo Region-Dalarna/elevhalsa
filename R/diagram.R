@@ -185,18 +185,27 @@ elevhalsa_rita_detalj <- function(df_kort, konsuppdelat) {
   )
   d$data_id <- paste(d$aldersgrupp, d$kon, d$svar, sep = "_")
 
+  # Legenden ligger till höger (vertikal lista) istället för under
+  # diagrammet - en horisontell legend får inte plats när det finns många
+  # eller långa svarsalternativ (de radbryts här också, så långa texter
+  # inte tvingar fram en orimligt bred legendkolumn).
+  etiketter <- vapply(svar_niva, function(x) paste(strwrap(x, width = 22), collapse = "\n"), character(1))
+
   g <- ggplot2::ggplot(d, ggplot2::aes(x = .data$aldersgrupp, y = .data$andel, fill = .data$svar)) +
     ggiraph::geom_col_interactive(
       ggplot2::aes(tooltip = .data$tooltip, data_id = .data$data_id),
       position = "stack", width = 0.6
     ) +
-    ggplot2::scale_fill_manual(values = elevhalsa_farg_ramp(length(svar_niva), RD_PRIMARY), name = NULL) +
+    ggplot2::scale_fill_manual(
+      values = elevhalsa_farg_ramp(length(svar_niva), RD_PRIMARY),
+      labels = etiketter, name = NULL
+    ) +
     ggplot2::scale_y_continuous(limits = c(0, 100), expand = ggplot2::expansion(mult = c(0, 0.02))) +
     ggplot2::labs(x = NULL, y = "Andel (%)") +
     elevhalsa_tema() +
-    ggplot2::theme(legend.position = "bottom")
+    ggplot2::theme(legend.position = "right", legend.text = ggplot2::element_text(size = 9))
 
   if (konsuppdelat) g <- g + ggplot2::facet_wrap(~ kon)
 
-  elevhalsa_girafe(g, width_svg = 8, height_svg = 5)
+  elevhalsa_girafe(g, width_svg = 9, height_svg = 5)
 }
