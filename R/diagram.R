@@ -63,11 +63,36 @@ elevhalsa_summera_totalt <- function(df_kort) {
   df_kort[df_kort$kon == "Totalt", ]
 }
 
+# Summerar "andel" för rader som redan är flaggade pos_neg == 100 inom
+# samma grupp (t.ex. åldersgrupp, eller åldersgrupp+kön/region). Vissa
+# frågor levererar headline-andelen uppdelad på flera råa svarsalternativ
+# (t.ex. "3-4 dagar", "5-6 dagar", "Varje dag" som alla räknas som
+# "minst tre dagar i veckan") istället för en enda färdig rad - utan
+# summering skulle headline-stapeln bara visa en bråkdel av rätt andel.
+#
+# Detta är en addition av redan färdigberäknade procenttal, inte en ny
+# beräkning utifrån råa antal - användaren godkände uttryckligen detta
+# undantag från "inga andelar ska beräknas"-regeln för just detta fall
+# (2026-10-30). Övriga kolumner (t.ex. litet_urval, grupp_n) är desamma
+# för alla rader i gruppen och tas oförändrade från första raden.
+elevhalsa_summera_headline <- function(df_positiva, grupperingskolumner) {
+  if (nrow(df_positiva) == 0) return(df_positiva)
+  nyckel  <- interaction(df_positiva[grupperingskolumner], drop = TRUE)
+  grupper <- split(df_positiva, nyckel)
+  rader <- lapply(grupper, function(g) {
+    rad <- g[1, , drop = FALSE]
+    rad$andel <- sum(g$andel, na.rm = TRUE)
+    rad
+  })
+  do.call(rbind, rader)
+}
+
 # ---- Förenklad vy: en stapel per åldersgrupp, baserat på "headline"- ------
 # raden (pos_neg == 100) för vald indikator.
 
 elevhalsa_rita_diagram <- function(df_totalt) {
   d <- df_totalt[!is.na(df_totalt$pos_neg) & df_totalt$pos_neg == 100, ]
+  d <- elevhalsa_summera_headline(d, "aldersgrupp")
   if (nrow(d) == 0) {
     return(elevhalsa_girafe(elevhalsa_tom_plot("Inget att visa för valda filter")))
   }
@@ -108,6 +133,7 @@ elevhalsa_rita_diagram <- function(df_totalt) {
 # legenden visar "Flickor", "Pojkar" och "Färre än 5" tillsammans.
 elevhalsa_rita_diagram_kon <- function(df_kort) {
   d <- df_kort[df_kort$kon %in% names(KON_FARGER) & !is.na(df_kort$pos_neg) & df_kort$pos_neg == 100, ]
+  d <- elevhalsa_summera_headline(d, c("aldersgrupp", "kon"))
   if (nrow(d) == 0) {
     return(elevhalsa_girafe(elevhalsa_tom_plot("Inget att visa för valda filter")))
   }

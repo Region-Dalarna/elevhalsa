@@ -63,6 +63,19 @@ summeras fram i appen, alla andelar är redan färdigberäknade i
 databasen. Kön är inte längre ett sidopanelsfilter - det styrs per
 diagram.
 
+**Undantag från "inga andelar beräknas":** vissa frågor levererar
+headline-andelen (`pos_neg == 100`) uppdelad på flera råa
+svarsalternativ istället för en enda färdig rad (t.ex. "3-4 dagar",
+"5-6 dagar" och "Varje dag" som alla räknas som "minst tre dagar i
+veckan"). Utan summering skulle sammanfattningsstapeln bara visa en
+bråkdel av rätt andel. `elevhalsa_summera_headline()` i `R/diagram.R`
+adderar därför ihop redan färdigberäknade procenttal inom samma grupp
+(åldersgrupp, ev. + kön/region) - det är addition av befintliga tal,
+inte en ny statistisk beräkning från råa antal. Användaren godkände
+detta undantag uttryckligen (2026-10-30) efter att ha sett att
+diagrammet annars visade flera synliga segment istället för en tydlig
+andel.
+
 Kommunkartans egna åldersgrupp-väljare väljer "Åk 7" som standard om det
 finns i datan (`elevhalsa_standardval()` i `R/ui_hjalpare.R`).
 

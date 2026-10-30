@@ -66,8 +66,9 @@ shinyServer(function(input, output, session) {
       kort_data_totalt <- reactive(elevhalsa_summera_totalt(kort_data()))
 
       # Kartans data: en rad per kommun, för den åldersgrupp som är vald i
-      # kartflikens egen väljare - totalt över båda könen, bara den
-      # "positiva" svarsraden (pos_neg == 100).
+      # kartflikens egen väljare - totalt över båda könen, summerad andel
+      # av de "positiva" svarsraderna (pos_neg == 100, se
+      # elevhalsa_summera_headline() i R/diagram.R).
       kort_data_kommuner <- reactive({
         rad <- vald_rad()
         req(nrow(rad) == 1, input[[karta_aldersgrupp_input]])
@@ -75,7 +76,8 @@ shinyServer(function(input, output, session) {
         df <- df[df$topic == rad$topic & df$variabelnamn == rad$variabelnamn & df$heading == rad$heading &
                    df$aldersgrupp == input[[karta_aldersgrupp_input]], ]
         df <- elevhalsa_summera_totalt(df)
-        df[!is.na(df$pos_neg) & df$pos_neg == 100, ]
+        df <- df[!is.na(df$pos_neg) & df$pos_neg == 100, ]
+        elevhalsa_summera_headline(df, "region")
       })
 
       output[[paste0('rubrik_', slug)]] <- renderUI({
