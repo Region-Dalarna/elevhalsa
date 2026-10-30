@@ -5,8 +5,6 @@ library(RPostgres)
 library(sf)
 library(dbplyr)
 library(shiny.telemetry)
-library(rddiagram)
-library(rdgis)
 library(rdverktyg)
 library(tibble)
 # ... lägg till fler paket vid behov

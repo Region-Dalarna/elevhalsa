@@ -29,61 +29,55 @@ shinyServer(function(input, output, session) {
     df
   })
 
-  # Ett set med output$-renderare per kort (topic + variabelnamn + heading).
-  # local() behövs så att varje iteration fångar sin egen kort_id/tp/vb/hd -
-  # annars skulle alla renderare dela den sista radens värden.
-  for (i in seq_len(nrow(elevhalsa_meta))) {
+  # Ett set med output$-renderare per topic/flik - inte per indikator.
+  # Varje flik har en egen listruta (val_<slug>) som styr vilken indikator
+  # som visas i flikens gemensamma kort-yta. local() behövs så att varje
+  # iteration fångar sin egen topic/slug - annars skulle alla renderare
+  # dela den sista topicens värden.
+  for (tp in unique(elevhalsa_meta$topic)) {
     local({
-      rad     <- elevhalsa_meta[i, ]
-      kort_id <- rad$kort_id
-      tp      <- rad$topic
-      vb      <- rad$variabelnamn
-      hd      <- rad$heading
+      tp_lokal  <- tp
+      slug      <- elevhalsa_slug(tp_lokal)
+      val_input <- paste0('val_', slug)
+
+      vald_rad <- reactive({
+        req(input[[val_input]])
+        elevhalsa_meta[elevhalsa_meta$kort_id == input[[val_input]], ]
+      })
 
       kort_data <- reactive({
+        rad <- vald_rad()
+        req(nrow(rad) == 1)
         df <- filtrerad_data()
-        df[df$topic == tp & df$variabelnamn == vb & df$heading == hd, ]
+        df[df$topic == rad$topic & df$variabelnamn == rad$variabelnamn & df$heading == rad$heading, ]
       })
 
       # Kartans data: en rad per kommun, bara den "positiva" svarsraden
       # (pos_neg == 100) - samma värde som KPI-siffran bygger på.
       kort_data_kommuner <- reactive({
+        rad <- vald_rad()
+        req(nrow(rad) == 1)
         df <- filtrerad_data_alla_kommuner()
-        df <- df[df$topic == tp & df$variabelnamn == vb & df$heading == hd, ]
+        df <- df[df$topic == rad$topic & df$variabelnamn == rad$variabelnamn & df$heading == rad$heading, ]
         df[!is.na(df$pos_neg) & df$pos_neg == 100, ]
       })
 
-      output[[paste0('rubrik_', kort_id)]] <- renderUI(h4(hd))
-
-      output[[paste0('kpi_', kort_id)]] <- renderText({
+      output[[paste0('kpi_', slug)]] <- renderText({
         df <- kort_data()
         rad_kpi <- df[!is.na(df$pos_neg) & df$pos_neg == 100, ]
         if (nrow(rad_kpi) == 0) return(NULL)
         rad_kpi$andel_visning[1]
       })
 
-      output[[paste0('diagram_', kort_id)]] <- renderPlot({
-        df <- kort_data()
-        fotnot <- if (any(df$litet_urval)) {
-          paste0('Stapel saknas vid färre än ', LITET_URVAL_TROSKEL, ' svar.')
-        } else {
-          NULL
-        }
-        elevhalsa_rita_diagram(df[!df$litet_urval, ], fotnot = fotnot)
+      output[[paste0('diagram_', slug)]] <- ggiraph::renderGirafe({
+        elevhalsa_rita_diagram(kort_data())
       })
 
-      output[[paste0('karta_', kort_id)]] <- renderPlot({
-        df <- kort_data_kommuner()
-        fotnot <- if (any(df$litet_urval)) {
-          paste0('Kommuner med färre än ', LITET_URVAL_TROSKEL, ' svar visas inte.')
-        } else {
-          NULL
-        }
-        sf_kort <- elevhalsa_bygg_kommun_sf(df[!df$litet_urval, ], elevhalsa_kommunkarta)
-        elevhalsa_rita_karta(sf_kort, fotnot = fotnot)
+      output[[paste0('karta_', slug)]] <- ggiraph::renderGirafe({
+        elevhalsa_rita_karta(kort_data_kommuner(), elevhalsa_kommunkarta)
       })
 
-      output[[paste0('analys_', kort_id)]] <- renderUI({
+      output[[paste0('analys_', slug)]] <- renderUI({
         df  <- kort_data()
         txt <- unique(df$analys)
         txt <- txt[!is.na(txt) & nzchar(txt) & txt != 'Lägg till en text här']
