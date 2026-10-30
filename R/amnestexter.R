@@ -61,7 +61,7 @@ ELEVHALSA_AMNESTEXTER <- list(
     ),
     "<em>Källa: ELSA, Elevhälsodata Dalarna</em>"
   ),
-  "Ditt liv & din framtid" = c(
+  "Livet & framtiden" = c(
     paste(
       "<b>Livstillfredsställelse</b> är ett mått på psykiskt välbefinnande. Bland svenska skolbarn",
       "är den generellt hög, men ojämnt fördelad. Flickor rapporterar lägre livstillfredsställelse",
@@ -302,18 +302,44 @@ ELEVHALSA_AMNESTEXTER <- list(
   )
 )
 
+# Normaliserar en topic-sträng för jämförelse, oberoende av mindre
+# skillnader i stavning ("och" vs "&", kommatecken, mellanslag) - delas
+# av textuppslaget nedan och flikordningen i R/ui_hjalpare.R.
+elevhalsa_normalisera_topic <- function(x) {
+  x <- tolower(x)
+  x <- gsub("&", "och", x, fixed = TRUE)
+  x <- gsub(",", "", x, fixed = TRUE)
+  x <- gsub("\\s+", " ", trimws(x))
+  x
+}
+
 # Hämtar ämnestexten för en topic, oberoende av mindre skillnader i
-# stavning ("och" vs "&", kommatecken, mellanslag) mot listan ovan.
+# stavning mot listan ovan.
 elevhalsa_hamta_amnestext <- function(topic) {
-  normalisera <- function(x) {
-    x <- tolower(x)
-    x <- gsub("&", "och", x, fixed = TRUE)
-    x <- gsub(",", "", x, fixed = TRUE)
-    x <- gsub("\\s+", " ", trimws(x))
-    x
-  }
-  namn_norm <- normalisera(names(ELEVHALSA_AMNESTEXTER))
-  traff <- which(namn_norm == normalisera(topic))
+  namn_norm <- elevhalsa_normalisera_topic(names(ELEVHALSA_AMNESTEXTER))
+  traff <- which(namn_norm == elevhalsa_normalisera_topic(topic))
   if (length(traff) == 1) return(ELEVHALSA_AMNESTEXTER[[traff]])
   character(0)
+}
+
+# Flikordning som matchar originalrapportens meny (Power BI). Topics som
+# inte finns i listan (t.ex. nya frågeområden som dyker upp i databasen
+# senare) hamnar sist, bokstavsordnade.
+ELEVHALSA_TOPIC_ORDNING <- c(
+  "Hälsa och välbefinnande",
+  "Fritid och rörelse",
+  "Matvanor",
+  "Skola och arbetsmiljö",
+  "Trivsel och relationer",
+  "ANDTS",
+  "Kropp, sexualitet & samtycke",
+  "Livet & framtiden"
+)
+
+elevhalsa_ordna_topic <- function(topics) {
+  unika <- unique(topics)
+  pos    <- match(elevhalsa_normalisera_topic(unika), elevhalsa_normalisera_topic(ELEVHALSA_TOPIC_ORDNING))
+  kanda  <- unika[!is.na(pos)][order(pos[!is.na(pos)])]
+  okanda <- sort(unika[is.na(pos)])
+  c(kanda, okanda)
 }
