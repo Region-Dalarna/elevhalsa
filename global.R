@@ -17,6 +17,15 @@ library(rdgis)
 library(rdverktyg)
 library(sf)
 
+# Shiny sourcar normalt R/*.R automatiskt innan global.R, men bara när
+# appen startas med runApp()/"Run App" - inte om man kör
+# source("global.R") direkt i konsolen för att testa. Sourcar därför R/
+# explicit här också, så det fungerar oavsett hur filen körs.
+for (elevhalsa_fil in list.files("R", pattern = "\\.R$", full.names = TRUE)) {
+  source(elevhalsa_fil)
+}
+rm(elevhalsa_fil)
+
 telemetry <- skapa_telemetry("elevhalsa")
 
 # Allmänna options - TRUE = visa inte R-felmeddelanden i appen,
