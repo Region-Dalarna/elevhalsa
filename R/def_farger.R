@@ -35,6 +35,14 @@ RD_TEXT_MUTED <- rd_farg("rd-text-muted", "#6c757d")
 # (se LITET_URVAL_TROSKEL i global.R).
 LITET_URVAL_FARG <- "#e1e5e8"
 
+# Könsfärger för det könsuppdelade diagrammet - samma vektor som
+# utbildning-appen (rd-kon-kvinnor/rd-kon-man), fast med elevhalsas egna
+# könskategorier som namn.
+KON_FARGER <- c(
+  "Flickor" = rd_farg("rd-kon-kvinnor", "#e2a855"),
+  "Pojkar"  = rd_farg("rd-kon-man",     "#459079")
+)
+
 # Interaktiv css (ligger i DOM:en, kan använda var(--rd-...) rakt av).
 RD_TOOLTIP_CSS <- paste0(
   "background:var(--rd-text);color:#fff;padding:6px 9px;",

@@ -49,5 +49,8 @@ elevhalsa_kommunkarta <- elevhalsa_hamta_kommunkarta()
 
 elevhalsa_val_ar          <- sort(unique(elevhalsa_data$ar), decreasing = TRUE)
 elevhalsa_val_aldersgrupp <- sort(unique(elevhalsa_data$aldersgrupp))
-elevhalsa_val_kon         <- sort(unique(elevhalsa_data$kon))
 elevhalsa_val_region      <- elevhalsa_filterval(elevhalsa_data, "region", "sortering_region")
+
+# Standardval så att appen visar data direkt vid start, t.ex. Årskurs 7
+# istället för den (alfabetiskt) första åldersgruppen.
+elevhalsa_standardval_aldersgrupp <- elevhalsa_standardval(elevhalsa_val_aldersgrupp)
