@@ -228,15 +228,19 @@ elevhalsa_rita_detalj <- function(df_kort, konsuppdelat) {
   # diagrammet - en horisontell legend får inte plats när det finns många
   # eller långa svarsalternativ (de radbryts här också, så långa texter
   # inte tvingar fram en orimligt bred legendkolumn).
-  etiketter <- vapply(svar_niva_med_dold, function(x) {
-    if (identical(x, dold_namn)) return(x)
-    paste(strwrap(x, width = 22), collapse = "\n")
-  }, character(1))
-  farger <- append(
-    elevhalsa_farg_ramp(length(svar_niva), RD_PRIMARY),
-    LITET_URVAL_FARG,
-    after = min(1, length(svar_niva))
+  #
+  # Namngivna vektorer (inte positionella) - annars droppar ggplot2
+  # automatiskt oanvända "Färre än N"-nivån ur skalan när inget är dolt,
+  # vilket med en onamngiven vektor skulle förskjuta alla efterföljande
+  # färger/etiketter ett steg och göra att t.ex. "Nej" fick fel färg.
+  etiketter <- stats::setNames(
+    vapply(svar_niva, function(x) paste(strwrap(x, width = 22), collapse = "\n"), character(1)),
+    svar_niva
   )
+  etiketter[dold_namn] <- dold_namn
+
+  farger <- stats::setNames(elevhalsa_farg_ramp(length(svar_niva), RD_PRIMARY), svar_niva)
+  farger[dold_namn] <- LITET_URVAL_FARG
 
   g <- ggplot2::ggplot(d, ggplot2::aes(x = .data$aldersgrupp, y = .data$varde, fill = .data$svar)) +
     ggiraph::geom_col_interactive(
