@@ -1943,6 +1943,46 @@
       "Maintainer": "Winston Chang <winston@posit.co>",
       "Repository": "CRAN"
     },
+    "httr": {
+      "Package": "httr",
+      "Version": "1.4.9",
+      "Source": "Repository",
+      "Title": "Tools for Working with URLs and HTTP",
+      "Authors@R": "c( person(\"Hadley\", \"Wickham\", , \"hadley@posit.co\", role = c(\"aut\", \"cre\")), person(\"Posit Software, PBC\", role = c(\"cph\", \"fnd\")) )",
+      "Description": "Useful tools for working with HTTP organised by HTTP verbs (GET(), POST(), etc). Configuration functions make it easy to control additional request components (authenticate(), add_headers() and so on).",
+      "License": "MIT + file LICENSE",
+      "URL": "https://httr.r-lib.org/, https://github.com/r-lib/httr",
+      "BugReports": "https://github.com/r-lib/httr/issues",
+      "Depends": [
+        "R (>= 3.6)"
+      ],
+      "Imports": [
+        "curl (>= 5.1.0)",
+        "jsonlite",
+        "mime",
+        "openssl (>= 0.8)",
+        "R6"
+      ],
+      "Suggests": [
+        "covr",
+        "httpuv",
+        "jpeg",
+        "knitr",
+        "png",
+        "readr",
+        "rmarkdown",
+        "testthat (>= 0.8.0)",
+        "xml2"
+      ],
+      "VignetteBuilder": "knitr",
+      "Config/Needs/website": "tidyverse/tidytemplate",
+      "Config/roxygen2/version": "8.1.0",
+      "Encoding": "UTF-8",
+      "NeedsCompilation": "no",
+      "Author": "Hadley Wickham [aut, cre], Posit Software, PBC [cph, fnd]",
+      "Maintainer": "Hadley Wickham <hadley@posit.co>",
+      "Repository": "CRAN"
+    },
     "httr2": {
       "Package": "httr2",
       "Version": "1.3.0",
@@ -3003,6 +3043,49 @@
       "Maintainer": "Hadley Wickham <hadley@posit.co>",
       "Repository": "CRAN"
     },
+    "pxweb2r": {
+      "Package": "pxweb2r",
+      "Version": "0.0.0.9000",
+      "Source": "GitHub",
+      "Title": "Get Data From a PxWeb API v2",
+      "Authors@R": "person(\"Peter\", \"Möller\", , \"larspetermoller@gmail.com\", role = c(\"aut\", \"cre\"))",
+      "Description": "Tools for fetching data and metadata from a PxWeb API v2, by default Statistics Sweden's statistical database. Handles automatic chunking of large requests, label values in queries, wildcards, \"latest period\", aggregations, and splitting DeSO and RegSO by municipality. Results are returned as tidy tibbles.",
+      "License": "MIT + file LICENSE",
+      "Encoding": "UTF-8",
+      "Roxygen": "list(markdown = TRUE)",
+      "Depends": [
+        "R (>= 4.1)"
+      ],
+      "Imports": [
+        "dplyr",
+        "httr",
+        "jsonlite",
+        "purrr",
+        "rjstat",
+        "rlang",
+        "stats",
+        "stringr",
+        "tibble",
+        "tidyr",
+        "utils"
+      ],
+      "Suggests": [
+        "clipr",
+        "testthat (>= 3.0.0)"
+      ],
+      "Config/testthat/edition": "3",
+      "URL": "https://github.com/FaluPeppe/pxweb2r",
+      "BugReports": "https://github.com/FaluPeppe/pxweb2r/issues",
+      "Config/roxygen2/version": "8.1.0",
+      "Author": "Peter Möller [aut, cre]",
+      "Maintainer": "Peter Möller <larspetermoller@gmail.com>",
+      "RemoteType": "github",
+      "RemoteHost": "api.github.com",
+      "RemoteUsername": "FaluPeppe",
+      "RemoteRepo": "pxweb2r",
+      "RemoteRef": "main",
+      "RemoteSha": "f2967ecd5a51b38c69e6c823ed62e9a78006609c"
+    },
     "rappdirs": {
       "Package": "rappdirs",
       "Version": "0.3.4",
@@ -3094,6 +3177,53 @@
       "RemoteRef": "main",
       "RemoteSha": "ecfa6dcbba4eddb2dd651738d6c349be65073448"
     },
+    "rdgis": {
+      "Package": "rdgis",
+      "Version": "0.0.0.9001",
+      "Source": "GitHub",
+      "Title": "GIS-verktyg för Region Dalarnas Analysarbete",
+      "Authors@R": "c( person(\"Peter\", \"Möller\", , \"larspetermoller@gmail.com\", role = c(\"aut\", \"cre\")), person(\"Region Dalarna\", role = \"cph\") )",
+      "Description": "Hämta kartdata ur geodatabasen, skapa sf-objekt av ruttabeller och koordinatpar, geometriska hjälpfunktioner (centroider inuti polygoner, linjer längs punkter), läsa GIS-filer ur zip-arkiv och extrahera kolumnnamn ur ESRI-geodatabaser. Utbrutet ur geometri-avsnitten i func_GIS.R i Region-Dalarna/funktioner.",
+      "License": "MIT + file LICENSE",
+      "Encoding": "UTF-8",
+      "Roxygen": "list(markdown = TRUE)",
+      "Depends": [
+        "R (>= 4.5.0)"
+      ],
+      "Imports": [
+        "DBI",
+        "dplyr",
+        "rdpostgres",
+        "rlang",
+        "stats",
+        "stringr",
+        "tibble"
+      ],
+      "Suggests": [
+        "curl",
+        "data.table",
+        "rdverktyg",
+        "rio",
+        "sf",
+        "terra",
+        "testthat (>= 3.0.0)",
+        "withr"
+      ],
+      "Config/testthat/edition": "3",
+      "URL": "https://github.com/Region-Dalarna/rdpaket",
+      "BugReports": "https://github.com/Region-Dalarna/rdpaket/issues",
+      "Config/roxygen2/version": "8.1.0",
+      "Author": "Peter Möller [aut, cre], Region Dalarna [cph]",
+      "Maintainer": "Peter Möller <larspetermoller@gmail.com>",
+      "RemoteType": "github",
+      "Remotes": "FaluPeppe/pxweb2r, Region-Dalarna/rdpaket/packages/rdverktyg, Region-Dalarna/rdpaket/packages/rdpostgres",
+      "RemoteHost": "api.github.com",
+      "RemoteUsername": "Region-Dalarna",
+      "RemoteRepo": "rdpaket",
+      "RemoteSubdir": "packages/rdgis",
+      "RemoteRef": "main",
+      "RemoteSha": "ecfa6dcbba4eddb2dd651738d6c349be65073448"
+    },
     "rdpostgres": {
       "Package": "rdpostgres",
       "Version": "0.0.0.9002",
@@ -3179,6 +3309,65 @@
       "RemoteUsername": "Region-Dalarna",
       "RemoteRepo": "rdpaket",
       "RemoteSubdir": "packages/rdshinyappar",
+      "RemoteRef": "main",
+      "RemoteSha": "ecfa6dcbba4eddb2dd651738d6c349be65073448"
+    },
+    "rdverktyg": {
+      "Package": "rdverktyg",
+      "Version": "0.0.0.9004",
+      "Source": "GitHub",
+      "Title": "Allmänna Verktyg för Region Dalarnas Analysarbete",
+      "Authors@R": "c( person(\"Peter\", \"Möller\", , \"larspetermoller@gmail.com\", role = c(\"aut\", \"cre\")), person(\"Region Dalarna\", role = \"cph\") )",
+      "Description": "Samling av allmänna hjälpfunktioner för text, filer, SCB-hämtning och andra återkommande behov i Region Dalarnas analysarbete. Utbrutet ur funktionsskripten i Region-Dalarna/funktioner.",
+      "License": "MIT + file LICENSE",
+      "Encoding": "UTF-8",
+      "Roxygen": "list(markdown = TRUE)",
+      "Depends": [
+        "R (>= 4.5.0)"
+      ],
+      "Imports": [
+        "curl",
+        "dplyr",
+        "fs",
+        "httr",
+        "jsonlite",
+        "purrr",
+        "pxweb2r",
+        "rlang",
+        "stringi",
+        "stringr",
+        "tibble",
+        "tidyr",
+        "tidyselect"
+      ],
+      "Suggests": [
+        "clipr",
+        "keyring",
+        "openxlsx",
+        "readxl",
+        "remotes",
+        "rio",
+        "rKolada",
+        "rstudioapi",
+        "rvest",
+        "testthat (>= 3.0.0)",
+        "this.path",
+        "withr",
+        "xml2",
+        "zip"
+      ],
+      "Config/testthat/edition": "3",
+      "URL": "https://github.com/Region-Dalarna/rdpaket",
+      "BugReports": "https://github.com/Region-Dalarna/rdpaket/issues",
+      "Config/roxygen2/version": "8.1.0",
+      "Author": "Peter Möller [aut, cre], Region Dalarna [cph]",
+      "Maintainer": "Peter Möller <larspetermoller@gmail.com>",
+      "RemoteType": "github",
+      "Remotes": "FaluPeppe/pxweb2r",
+      "RemoteHost": "api.github.com",
+      "RemoteUsername": "Region-Dalarna",
+      "RemoteRepo": "rdpaket",
+      "RemoteSubdir": "packages/rdverktyg",
       "RemoteRef": "main",
       "RemoteSha": "ecfa6dcbba4eddb2dd651738d6c349be65073448"
     },
@@ -3294,6 +3483,30 @@
       "NeedsCompilation": "no",
       "Author": "Kevin Ushey [aut, cre] (ORCID: <https://orcid.org/0000-0003-2880-7407>), Hadley Wickham [aut] (ORCID: <https://orcid.org/0000-0003-4757-117X>), Posit Software, PBC [cph, fnd]",
       "Maintainer": "Kevin Ushey <kevin@rstudio.com>",
+      "Repository": "CRAN"
+    },
+    "rjstat": {
+      "Package": "rjstat",
+      "Version": "0.4.3",
+      "Source": "Repository",
+      "Title": "Handle 'JSON-stat' Format in R",
+      "Author": "Aaron Schumacher, Håkon Malmedal, Måns Magnusson",
+      "Maintainer": "Aaron Schumacher <ajschumacher@gmail.com>",
+      "Description": "Handle 'JSON-stat' format (<https://json-stat.org>) in R. Not all features are supported, especially the extensive metadata features of 'JSON-stat'.",
+      "License": "MIT + file LICENSE",
+      "Encoding": "UTF-8",
+      "URL": "https://github.com/ajschumacher/rjstat",
+      "BugReports": "https://github.com/ajschumacher/rjstat/issues",
+      "Imports": [
+        "jsonlite (>= 0.9.8)",
+        "checkmate (>= 1.7.0)"
+      ],
+      "Suggests": [
+        "testthat (>= 1.0.0)",
+        "reshape (>= 0.7)"
+      ],
+      "RoxygenNote": "7.2.3",
+      "NeedsCompilation": "no",
       "Repository": "CRAN"
     },
     "rlang": {
