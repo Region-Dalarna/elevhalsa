@@ -9,9 +9,34 @@
 # och mellanslag, så mindre stavningsskillnader mot den exakta
 # topic-strängen spelar ingen roll.
 #
-# OBS: saknar ännu text för "Ditt liv & din framtid" och
-# "Kropp, sexualitet & samtycke" - lägg till när de kommer.
+# OBS: saknar ännu text för "Kropp, sexualitet & samtycke" - lägg till
+# när den kommer.
 ELEVHALSA_AMNESTEXTER <- list(
+  "Ditt liv & din framtid" = c(
+    paste(
+      "<b>Livstillfredsställelse</b> är ett mått på psykiskt välbefinnande. Bland svenska skolbarn",
+      "är den generellt hög, men ojämnt fördelad. Flickor rapporterar lägre livstillfredsställelse",
+      "än pojkar, och nivån sjunker med åldern för båda könen. Barn med funktionsnedsättning, barn",
+      "som bor med en förälder eller utan sina föräldrar, samt barn i familjer med sämre",
+      "socioekonomiska villkor uppger lägre livstillfredsställelse. Sambandet gäller både faktiska",
+      "materiella tillgångar och hur familjens situation upplevs i jämförelse med andra."
+    ),
+    paste(
+      "I elevhälsoformuläret skattar elever sin livstillfredsställelse på en skala från 0 till 10,",
+      "där 10 är ”Toppen”. Resultaten i Dalarna följer samma mönster som nationellt: flickor",
+      "är mindre nöjda än pojkar och livstillfredsställelsen minskar med stigande ålder."
+    ),
+    paste(
+      "<b>Framtidstro</b> handlar om optimism inför den egna framtiden. Forskning visar att",
+      "optimister oftare försöker lösa problem snarare än undvika dem, vilket bidrar till bättre",
+      "anpassning, mindre frustration och förbättrad hälsa. Positiv framtidstro stärks av socialt",
+      "stöd från familj, vänner och skola, akademiska framgångar, sociokulturella faktorer och",
+      "trygghet i närområdet. Den är vanligare bland yngre än äldre ungdomar. Enligt ELSA har en",
+      "hög andel elever positiv framtidstro, med jämn könsfördelning och stabila nivåer mellan",
+      "åldersgrupper."
+    ),
+    "<em>Källa: ELSA, Elevhälsodata Dalarna</em>"
+  ),
   "Hälsa och välbefinnande" = c(
     paste(
       "De flesta barn och unga i Sverige är nöjda med livet och upplever sin hälsa som god.",
