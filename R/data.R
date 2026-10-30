@@ -9,15 +9,19 @@
 # strukturerad) data.frame om uppkopplingen eller tabellen saknar data, så
 # att appen går att starta innan data finns på plats i databasen.
 elevhalsa_hamta_data <- function() {
-  con <- tryCatch(rdpostgres::uppkoppling_db(db_name = "sekretess"), error = function(e) NULL)
+  con <- rdshinyappar::shiny_uppkoppling_las(db_name = "sekretess", db_user = "shiny_las_sekretess")
   if (is.null(con)) {
-    warning("elevhalsa: kunde inte koppla upp mot databasen 'sekretess'.", call. = FALSE)
+    warning(
+      "elevhalsa: kunde inte koppla upp mot databasen 'sekretess' som shiny_las_sekretess. ",
+      "Lösenordet måste sparas lokalt med rdshinyappar::shiny_set_password('shiny_las_sekretess').",
+      call. = FALSE
+    )
     return(elevhalsa_tom_data())
   }
   on.exit(DBI::dbDisconnect(con), add = TRUE)
 
   df <- tryCatch(
-    rdpostgres::postgres_tabell_till_df(con, schema = "folkhalsa", tabell = "elevhalsa"),
+    DBI::dbGetQuery(con, "SELECT * FROM folkhalsa.elevhalsa"),
     error = function(e) NULL
   )
   if (is.null(df) || nrow(df) == 0) {
