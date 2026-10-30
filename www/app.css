@@ -18,22 +18,49 @@
   text-align: center;
 }
 
-/* Ämnestexten ligger i sidopanelen (ui.R), inte i huvudytan - smalare
-   och mindre text än om den låg bredvid diagrammen. */
+/* Ämnestexten ligger i sidopanelen (ui.R), inte i huvudytan. Hopfälld som
+   standard (<details>) så den inte tar mer plats eller blir mer
+   framträdande än diagrammen den ska komplettera - man öppnar den själv
+   vid behov. */
 .elevhalsa-amnestext {
-  margin: 1.25rem 0 0;
-  padding: 0.75rem 1rem;
+  margin: 1rem 0 0;
+  padding: 0.5rem 0.75rem;
   background: #f7f9fa;
   border-left: 3px solid var(--rd-primary, #158daf);
   border-radius: 0 4px 4px 0;
-  font-size: 0.85rem;
-  line-height: 1.45;
+  font-size: 0.78rem;
+  line-height: 1.4;
+  color: var(--rd-text-muted, #6b7580);
+}
+
+.elevhalsa-amnestext summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--rd-primary, #158daf);
+  padding: 0.15rem 0;
+  list-style: none;
+}
+
+.elevhalsa-amnestext summary::-webkit-details-marker {
+  display: none;
+}
+
+.elevhalsa-amnestext summary::before {
+  content: "▸ ";
+}
+
+.elevhalsa-amnestext[open] summary::before {
+  content: "▾ ";
+}
+
+.elevhalsa-amnestext summary:hover {
+  text-decoration: underline;
 }
 
 .elevhalsa-amnestext p {
-  margin-bottom: 0.6rem;
+  margin: 0.6rem 0 0;
 }
 
-.elevhalsa-amnestext p:last-child {
-  margin-bottom: 0;
+.elevhalsa-amnestext p:first-of-type {
+  margin-top: 0.5rem;
 }

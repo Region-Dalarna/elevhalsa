@@ -1,14 +1,20 @@
 shinyServer(function(input, output, session) {
-  forsta_flik <- if (nrow(elevhalsa_meta) > 0) elevhalsa_meta$topic[1] else 'Om'
+  forsta_flik <- if (nrow(elevhalsa_meta) > 0) elevhalsa_ordna_topic(elevhalsa_meta$topic)[1] else 'Om'
   rdshinyappar::telemetri_server(telemetry, navigation_id = 'flikval', forsta_flik = forsta_flik)
 
   if (nrow(elevhalsa_meta) == 0) return(invisible(NULL))
 
-  # Ämnestexten i sidopanelen följer vilken flik som är aktiv.
+  # Ämnestexten i sidopanelen följer vilken flik som är aktiv. Hopfälld
+  # som standard (<details>) - texten tar annars för mycket plats och blir
+  # mer framträdande än diagrammen den ska komplettera.
   output$sidopanel_amnestext <- renderUI({
     txt <- elevhalsa_hamta_amnestext(input$flikval)
     if (length(txt) == 0) return(NULL)
-    tags$div(class = 'elevhalsa-amnestext', lapply(txt, function(t) tags$p(shiny::HTML(t))))
+    tags$details(
+      class = 'elevhalsa-amnestext',
+      tags$summary('Kort om frågeområdet'),
+      lapply(txt, function(t) tags$p(shiny::HTML(t)))
+    )
   })
 
   # Bas-filter: år + region. Åldersgrupp visas som grupperingsdimension i

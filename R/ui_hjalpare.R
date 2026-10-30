@@ -13,10 +13,12 @@
 # Gör om en text till ett giltigt, stabilt input/output-id.
 elevhalsa_slug <- function(x) gsub("[^A-Za-z0-9]+", "_", x)
 
-# En flik per topic: listruta + den gemensamma kort-ytan.
+# En flik per topic: listruta + den gemensamma kort-ytan. Flikordningen
+# följer originalrapportens meny (ELEVHALSA_TOPIC_ORDNING i
+# R/amnestexter.R), inte den ordning topics råkar dyka upp i databasen.
 elevhalsa_bygg_flikar <- function(meta) {
   if (nrow(meta) == 0) return(list())
-  lapply(unique(meta$topic), function(tp) {
+  lapply(elevhalsa_ordna_topic(meta$topic), function(tp) {
     slug  <- elevhalsa_slug(tp)
     rader <- meta[meta$topic == tp, ]
     val   <- stats::setNames(rader$kort_id, rader$heading)
