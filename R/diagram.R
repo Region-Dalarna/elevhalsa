@@ -186,10 +186,12 @@ elevhalsa_rita_diagram_kon <- function(df_kort) {
 # (RD-grön) och skiljs åt med ett facet-stripe-namn istället - ggplot2 har
 # inget enkelt sätt att ge varje facet-panel en egen fyllnadsskala.
 #
-# OBS: ingen litet_urval-maskering här ännu - en dold understapel skulle
-# göra att hela stapeln inte längre summerar till 100 %, vilket kräver mer
-# eftertanke än det här första utkastet. Följ upp om små urval dyker upp
-# bland de råa svarsalternativen.
+# Enstaka svarsalternativ kan vara maskerade direkt i databasen (andel =
+# NA) även om hela frågegruppen (grupp_n) är stor nog för att inte
+# fångas av elevhalsa_maskera_litet_urval()/litet_urval, som bara ser
+# till totalen för hela åldersgruppen. Döljs som en egen grå kategori,
+# med en platshållarhöjd istället för att raden faller bort ur stapeln
+# (vilket annars gör att stapeln inte längre når 100 %).
 elevhalsa_farg_ramp <- function(n, bas) {
   if (n <= 1) return(bas)
   grDevices::colorRampPalette(c("#f2f2f2", bas))(n)
@@ -203,11 +205,22 @@ elevhalsa_rita_detalj <- function(df_kort, konsuppdelat) {
   }
 
   d$aldersgrupp <- elevhalsa_aldersgrupp_factor(d$aldersgrupp)
-  svar_niva <- unique(d$svar[order(d$sortering_svar)])
-  d$svar <- factor(d$svar, levels = svar_niva)
+  svar_niva <- as.character(unique(d$svar[order(d$sortering_svar)]))
+
+  dold_namn <- paste0("Färre än ", LITET_URVAL_TROSKEL)
+  d$dold  <- is.na(d$andel) | (!is.na(d$litet_urval) & d$litet_urval)
+  d$varde <- ifelse(d$dold, LITET_URVAL_PLATSHALLARE, d$andel)
+
+  # Dold-kategorin sätts in direkt efter det ovanligaste svarsalternativet
+  # (lägst sortering_svar) - det är där små/maskerade grupper statistiskt
+  # sett är mest troliga. Exakt placering spelar mindre roll eftersom "<5"
+  # redan signalerar att det riktiga värdet inte visas.
+  svar_niva_med_dold <- append(svar_niva, dold_namn, after = min(1, length(svar_niva)))
+  d$svar <- factor(ifelse(d$dold, dold_namn, as.character(d$svar)), levels = svar_niva_med_dold)
+
   d$tooltip <- paste0(
     "<b>", d$aldersgrupp, if (konsuppdelat) paste0(" · ", d$kon) else "", "</b><br/>",
-    d$svar, ": ", round(d$andel), " %"
+    ifelse(d$dold, paste0(dold_namn, ": ", LITET_URVAL_ETIKETT), paste0(d$svar, ": ", round(d$andel), " %"))
   )
   d$data_id <- paste(d$aldersgrupp, d$kon, d$svar, sep = "_")
 
@@ -215,9 +228,17 @@ elevhalsa_rita_detalj <- function(df_kort, konsuppdelat) {
   # diagrammet - en horisontell legend får inte plats när det finns många
   # eller långa svarsalternativ (de radbryts här också, så långa texter
   # inte tvingar fram en orimligt bred legendkolumn).
-  etiketter <- vapply(svar_niva, function(x) paste(strwrap(x, width = 22), collapse = "\n"), character(1))
+  etiketter <- vapply(svar_niva_med_dold, function(x) {
+    if (identical(x, dold_namn)) return(x)
+    paste(strwrap(x, width = 22), collapse = "\n")
+  }, character(1))
+  farger <- append(
+    elevhalsa_farg_ramp(length(svar_niva), RD_PRIMARY),
+    LITET_URVAL_FARG,
+    after = min(1, length(svar_niva))
+  )
 
-  g <- ggplot2::ggplot(d, ggplot2::aes(x = .data$aldersgrupp, y = .data$andel, fill = .data$svar)) +
+  g <- ggplot2::ggplot(d, ggplot2::aes(x = .data$aldersgrupp, y = .data$varde, fill = .data$svar)) +
     ggiraph::geom_col_interactive(
       ggplot2::aes(tooltip = .data$tooltip, data_id = .data$data_id),
       # reverse = TRUE så att svarsalternativen staplas underifrån och upp
@@ -228,8 +249,8 @@ elevhalsa_rita_detalj <- function(df_kort, konsuppdelat) {
       position = ggplot2::position_stack(reverse = TRUE), width = 0.6
     ) +
     ggplot2::scale_fill_manual(
-      values = elevhalsa_farg_ramp(length(svar_niva), RD_PRIMARY),
-      labels = etiketter, name = NULL
+      values = farger, labels = etiketter, name = NULL,
+      breaks = if (any(d$dold)) svar_niva_med_dold else svar_niva
     ) +
     ggplot2::scale_y_continuous(limits = c(0, 100), expand = ggplot2::expansion(mult = c(0, 0.02))) +
     ggplot2::labs(x = NULL, y = "Andel (%)") +
