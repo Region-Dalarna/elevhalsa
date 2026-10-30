@@ -5,4 +5,20 @@
    kan överstyra den delade identiteten vid behov.
    ============================================================ */
 
-/* Lägg appspecifika regler här. */
+.elevhalsa-kort {
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.elevhalsa-kort__kpi {
+  font-size: 1.8rem;
+  font-weight: 600;
+}
+
+.elevhalsa-tom {
+  max-width: 40rem;
+  margin: 3rem auto;
+  text-align: center;
+}

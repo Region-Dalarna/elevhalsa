@@ -13,7 +13,7 @@ shinyUI(
     # ---- Header (matchar .rd-header i regiondalarna_ruf.css) --------------
     tags$div(
       class = 'rd-header',
-      tags$div(class = 'rd-header__title', 'elevhalsa'),
+      tags$div(class = 'rd-header__title', 'Elevhälsa'),
       tags$a(
         class  = 'rd-header__right',
         href   = 'https://www.regiondalarna.se',
@@ -22,15 +22,30 @@ shinyUI(
       )
     ),
 
-    # ---- Innehåll ---------------------------------------------------------
-    tabsetPanel(
-      id = 'flikval',
-      tabPanel('Tab 1',
-        h3('Hej från elevhalsa'),
-        verbatimTextOutput('example_text')
-      ),
-      tabPanel('Om', p('Beskriv applikationen här.'))
-    ),
+    # ---- Innehåll -----------------------------------------------------------
+    if (nrow(elevhalsa_meta) == 0) {
+      tags$div(
+        class = 'elevhalsa-tom',
+        h3('Ingen data ännu'),
+        p('Tabellen folkhalsa.elevhalsa i databasen sekretess innehåller inget just nu.')
+      )
+    } else {
+      sidebarLayout(
+        sidebarPanel(
+          selectInput('filter_ar', 'År', choices = elevhalsa_val_ar),
+          selectInput('filter_aldersgrupp', 'Åldersgrupp', choices = elevhalsa_val_aldersgrupp),
+          selectInput('filter_kon', 'Kön', choices = c('Alla', elevhalsa_val_kon)),
+          selectInput('filter_region', 'Region', choices = elevhalsa_val_region)
+        ),
+        mainPanel(
+          do.call(tabsetPanel, c(
+            list(id = 'flikval'),
+            elevhalsa_bygg_flikar(elevhalsa_meta),
+            list(tabPanel('Om', p('Beskriv applikationen här.')))
+          ))
+        )
+      )
+    },
 
     # ---- Footer (matchar .rd-footer i regiondalarna_ruf.css) --------------
     tags$div(
