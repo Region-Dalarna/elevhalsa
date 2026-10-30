@@ -11,8 +11,6 @@ library(tidyr)
 library(readr)
 library(ggplot2)
 library(rdshinyappar)
-library(rddiagram)
-library(rdgis)
 library(rdverktyg)
 library(sf)
 
@@ -37,6 +35,10 @@ options(shiny.sanitize.errors = FALSE)
 # som regionens övriga statistikappar.
 LITET_URVAL_TROSKEL <- 5
 LITET_URVAL_ETIKETT <- "< 5"
+
+# Fast stapelhöjd (andel-skala 0-100) för de grå platshållarstaplarna, så
+# att en dold stapel inte avslöjar sitt riktiga värde genom sin höjd.
+LITET_URVAL_PLATSHALLARE <- 3
 
 # Läs in data en gång vid appstart (inte per session/filterval).
 elevhalsa_data <- elevhalsa_hamta_data() |>
