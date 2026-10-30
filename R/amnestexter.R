@@ -9,9 +9,58 @@
 # och mellanslag, så mindre stavningsskillnader mot den exakta
 # topic-strängen spelar ingen roll.
 #
-# OBS: saknar ännu text för "Kropp, sexualitet & samtycke" - lägg till
-# när den kommer.
 ELEVHALSA_AMNESTEXTER <- list(
+  "Kropp, sexualitet & samtycke" = c(
+    paste(
+      "<b>Under puberteten blir både flickor och pojkar mer medvetna om den egna kroppen</b> och",
+      "börjar jämföra sig med andra. Det är också vanligt att unga då får en mer negativ syn på",
+      "sin kropp ju äldre de blir. Denna missnöjdhet med den egna kroppen kan uttryckas i en vilja",
+      "vara smal eller muskulös, och kan kopplas till lägre psykiskt välbefinnande."
+    ),
+    paste(
+      "I Folkhälsomyndighetens rapportering om Skolbarns hälsovanor beskrivs studier som visar att",
+      "det inte är ovanligt att tonåringar försöker gå ner i vikt med hjälp av olämpliga metoder",
+      "som kan ge skadliga hälsoeffekter, såsom näringsbrist, minskad tillväxt,",
+      "menstruationsstörningar och benskörhet bland flickor. Bantning i tonåren är också förenat",
+      "med ökad risk för senare ätstörningar och övervikt."
+    ),
+    paste(
+      "<b>Ungas välmående i relation till sexuell hälsa</b> hör till området sexuell och",
+      "reproduktiv hälsa och rättigheter (SRHR) som är en förutsättning för människors",
+      "välbefinnande och generella hälsa. Det kan handla om att få avgöra om och när man vill ha",
+      "sex, själv få välja sina sexualpartners samt få tillgång till hälso- och sjukvård och andra",
+      "hälsofrämjande insatser. Det gäller också rätten att få avgöra om, när och hur man vill ha",
+      "barn och hur många barn man vill ha. Ungdomsårens sexualitet är sammanflätad med",
+      "identitetsutveckling och social utveckling, och kan ha betydelse för den sexuella hälsan",
+      "genom hela livet."
+    ),
+    paste(
+      "I den nationella SRHR-strategin från 2020, vars huvudmål är en god jämlik och jämställd",
+      "sexuell och reproduktiv hälsa i hela befolkningen, är unga och unga vuxna en central",
+      "målgrupp."
+    ),
+    paste(
+      "Av undersökningen Skolbarns hälsovanor från 2021/22 framgår att andelen 15-åringar som har",
+      "haft samlag har minskat sedan 2000 till en nivå på ca 20 % för både flickor och pojkar. Man",
+      "ser också att användningen av kondom har halverats bland 15-åringar under 2010-talet, till",
+      "att användas av ca 30 % av flickorna och drygt 40 % av pojkarna. P-pilleranvändningen vid",
+      "senaste samlaget ligger under 50 % för både flickor och pojkar."
+    ),
+    paste(
+      "Internet, skolundervisning och ungdomsmottagningen är de ungas viktigaste källor till",
+      "information om dessa frågor. Bland unga 15–19 år är det betydligt större andel flickor än",
+      "pojkar som har ungdomsmottagningen som huvudsaklig informationskälla. Skolbarns hälsovanor",
+      "2021/22 visar också att det är vanligare att flickor får information och pratar om",
+      "sexualitet och relationer, jämfört med pojkar."
+    ),
+    paste(
+      "Granskningar av skolans undervisning inom SRHR-området har visat på brister i likvärdighet",
+      "mellan skolor och tenderar, enligt de unga, att fokusera på vissa aspekter av sexualitet",
+      "såsom hur man blir gravid och kunskaper om kroppen och kondomanvändning, men mindre på",
+      "aspekter såsom relationer, jämställdhet och normer."
+    ),
+    "<em>Källa: ELSA, Elevhälsodata Dalarna</em>"
+  ),
   "Ditt liv & din framtid" = c(
     paste(
       "<b>Livstillfredsställelse</b> är ett mått på psykiskt välbefinnande. Bland svenska skolbarn",
