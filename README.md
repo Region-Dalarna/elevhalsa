@@ -18,13 +18,27 @@ valda indikatorn visas, inte alla staplade under varandra. Nya
 frågor/ämnen i tabellen dyker upp i appen automatiskt, inget behöver
 hårdkodas i UI:t.
 
-Varje flik har förutom stapeldiagrammet (filtrerat på valt regionfilter)
-även en kommunkarta (`R/karta.R`) som alltid visar alla 15 kommuner
-samtidigt - datan finns bara på kommunnivå, ingen nivå under, så kartan
-lyssnar inte på regionfiltret i sidopanelen. Kartan visar andelen för
-den rad per kommun där `pos_neg == 100`, samma värde som KPI-siffran.
+Varje flik har tre vyer: ett förenklat diagram (headline-andelen,
+`pos_neg == 100`), en detaljerad vy med alla ursprungliga svarsalternativ
+(100 %-staplat) och en kommunkarta (`R/karta.R`) som alltid visar alla 15
+kommuner samtidigt - datan finns bara på kommunnivå, ingen nivå under, så
+kartan lyssnar inte på regionfiltret i sidopanelen, och har en egen
+åldersgrupp-väljare (en karta kan bara visa en åldersgrupp åt gången).
 Kommunnamnet i `region` kopplas till kommunpolygonerna via kommunkod
 (`rdverktyg::hamta_kommunkoder()`).
+
+Åldersgrupp är INTE ett filter längre - den visas som
+grupperingsdimension på x-axeln i diagrammen (Förskoleklass/Åk 4/Åk 7/
+År 1 gymnasiet sida vid sida), ordnad pedagogiskt istället för
+alfabetiskt (`ALDERSGRUPP_ORDNING`/`elevhalsa_ordna_aldersgrupp()` i
+R/data.R). Inspirerat av den tidigare Power BI-rapporten, som visade
+årskurserna sida vid sida istället för som ett filter som döljer de
+andra.
+
+Varje flik har en ämnestext överst ("Kort om frågeområdet", som i den
+tidigare rapporten) - redaktionellt innehåll från Samhällsanalys,
+hårdkodat i `R/amnestexter.R` (inte läst ur `analys`-kolumnen i
+databasen, som bara innehöll platshållartext).
 
 Diagram och karta är ren `ggplot2` + `ggiraph` (`geom_col_interactive`/
 `geom_sf_interactive`), enligt samma mönster som `utbildning`
@@ -38,14 +52,14 @@ med för få individer (`litet_urval`) ritas som gråa platshållare med
 Diagrammet har en Totalt/Könsuppdelat-växlare (`R/diagram.R`), som i
 `utbildning`-appen - men till skillnad från den appens antalsdiagram
 visas könen sida vid sida (dodge), inte staplade, eftersom andelar inte
-är additiva. "Totalt" använder en befintlig `kon == "Totalt"`-rad om
-datan har en sådan, annars summeras Flickor/Pojkar ihop och andelen
-räknas om (`elevhalsa_summera_totalt()`). Kön är inte längre ett
-sidopanelsfilter - det styrs per diagram.
+är additiva. "Totalt" plockar bara ut den befintliga `kon == "Totalt"`-
+raden (`elevhalsa_summera_totalt()`) - andelar räknas aldrig om eller
+summeras fram i appen, alla andelar är redan färdigberäknade i
+databasen. Kön är inte längre ett sidopanelsfilter - det styrs per
+diagram.
 
-Åldersgrupp-filtret väljer "Årskurs 7" som standard om det finns i
-datan (`elevhalsa_standardval()` i `R/ui_hjalpare.R`), så appen visar
-data direkt vid start istället för den alfabetiskt första åldersgruppen.
+Kommunkartans egna åldersgrupp-väljare väljer "Åk 7" som standard om det
+finns i datan (`elevhalsa_standardval()` i `R/ui_hjalpare.R`).
 
 **Att stämma av när riktig data finns på plats:** de exakta kolumnnamnen
 (särskilt stavning/skiftläge på t.ex. svarssorteringskolumnen) antogs

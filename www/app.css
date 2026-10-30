@@ -22,3 +22,20 @@
   margin: 3rem auto;
   text-align: center;
 }
+
+.elevhalsa-amnestext {
+  max-width: 60rem;
+  margin: 1rem 0 1.5rem;
+  padding: 0.75rem 1.25rem;
+  background: #f7f9fa;
+  border-left: 3px solid var(--rd-primary, #158daf);
+  border-radius: 0 4px 4px 0;
+}
+
+.elevhalsa-amnestext p {
+  margin-bottom: 0.75rem;
+}
+
+.elevhalsa-amnestext p:last-child {
+  margin-bottom: 0;
+}
