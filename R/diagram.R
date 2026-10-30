@@ -29,11 +29,19 @@ elevhalsa_tema <- function() {
 # är avstängd (opts_selection "none") - vi använder den inte till något
 # (ingen korsfiltrering), så den skulle bara vara en förvirrande
 # kvardröjande effekt om den stod på som ggiraphs standard.
-elevhalsa_girafe <- function(g, width_svg = 7, height_svg = 4.5) {
+#
+# hover_css är parametriserad: RD_HOVER_CSS byter ut segmentets färg mot
+# en fast mörk nyans - det fungerar bra för enfärgade diagram, men i ett
+# flerfärgat/staplat diagram (flera svarsalternativ i samma legend) gör
+# det att VILKET segment som helst blir mörkblått när musen är över det,
+# vilket ser ut som att ordningen hoppar runt. Där används istället en
+# relativ mörkning (samma knep som kartans RD_KARTA_HOVER_CSS) som bara
+# tonar ner segmentets befintliga färg utan att byta ut den.
+elevhalsa_girafe <- function(g, width_svg = 7, height_svg = 4.5, hover_css = RD_HOVER_CSS) {
   ggiraph::girafe(
     ggobj = g, width_svg = width_svg, height_svg = height_svg,
     options = list(
-      ggiraph::opts_hover(css = RD_HOVER_CSS),
+      ggiraph::opts_hover(css = hover_css),
       ggiraph::opts_tooltip(css = RD_TOOLTIP_CSS),
       ggiraph::opts_selection(type = "none"),
       ggiraph::opts_sizing(rescale = TRUE, width = 1),
@@ -170,7 +178,7 @@ elevhalsa_rita_diagram_kon <- function(df_kort) {
     elevhalsa_tema() +
     ggplot2::theme(legend.position = "top")
 
-  elevhalsa_girafe(g)
+  elevhalsa_girafe(g, hover_css = RD_HOVER_CSS_FLERFARGAD)
 }
 
 # ---- Detaljerad vy: alla ursprungliga svarsalternativ, 100%-staplat ------
@@ -264,5 +272,5 @@ elevhalsa_rita_detalj <- function(df_kort, konsuppdelat) {
 
   if (konsuppdelat) g <- g + ggplot2::facet_wrap(~ kon)
 
-  elevhalsa_girafe(g, width_svg = 9, height_svg = 5)
+  elevhalsa_girafe(g, width_svg = 9, height_svg = 5, hover_css = RD_HOVER_CSS_FLERFARGAD)
 }

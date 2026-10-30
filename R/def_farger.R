@@ -50,3 +50,9 @@ RD_TOOLTIP_CSS <- paste0(
 )
 RD_HOVER_CSS       <- "fill:var(--rd-primary-dark);cursor:pointer;"
 RD_KARTA_HOVER_CSS <- "filter:brightness(0.88);cursor:pointer;"
+# Relativ mörkning istället för en fast färg - för diagram med flera
+# fyllnadsfärger i samma legend (t.ex. Könsuppdelat och "Alla svar" i
+# R/diagram.R), där RD_HOVER_CSS annars skulle byta ut VILKEN färg som
+# helst mot samma mörkblå och göra det svårt att se vilket svarsalternativ
+# man pekar på.
+RD_HOVER_CSS_FLERFARGAD <- "filter:brightness(0.82);cursor:pointer;"
