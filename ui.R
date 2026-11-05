@@ -1,8 +1,10 @@
 source('global.R')
 
+APP_TITEL <- 'Elevhälsa'
+
 shinyUI(
   fluidPage(
-    title = 'elevhalsa',
+    title = APP_TITEL,  # webbläsarflikens rubrik
     tags$head(
       tags$link(rel = 'icon', type = 'image/x-icon', href = 'favicon.ico'),
       tags$link(rel = 'stylesheet', type = 'text/css', href = 'regiondalarna_ruf.css'),
@@ -13,7 +15,7 @@ shinyUI(
     # ---- Header (matchar .rd-header i regiondalarna_ruf.css) --------------
     tags$div(
       class = 'rd-header',
-      tags$div(class = 'rd-header__title', 'Elevhälsa'),
+      tags$div(class = 'rd-header__title', APP_TITEL),
       tags$a(
         class  = 'rd-header__right',
         href   = 'https://www.regiondalarna.se',
